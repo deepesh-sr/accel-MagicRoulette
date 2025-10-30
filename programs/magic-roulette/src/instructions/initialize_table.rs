@@ -1,4 +1,8 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{
+    prelude::*,
+    solana_program::native_token::LAMPORTS_PER_SOL,
+    system_program::{transfer, Transfer},
+};
 
 use crate::{Round, Table, ROUND_SEED, TABLE_SEED, VAULT_SEED};
 
@@ -8,7 +12,9 @@ pub struct InitializeTable<'info> {
     pub admin: Signer<'info>,
     /// CHECK: Vault for holding round bet amounts, system account
     #[account(
-        seeds = [VAULT_SEED],
+        // added admin key for extra security
+        mut,
+        seeds = [VAULT_SEED, admin.key().as_ref()],
         bump,
     )]
     pub vault: UncheckedAccount<'info>,
@@ -24,7 +30,7 @@ pub struct InitializeTable<'info> {
         init,
         payer = admin,
         space = Round::DISCRIMINATOR.len() + Round::INIT_SPACE,
-        seeds = [ROUND_SEED, 0_u8.to_le_bytes().as_ref()],
+        seeds = [ROUND_SEED],
         bump,
     )]
     pub round: Account<'info, Round>,
@@ -32,9 +38,46 @@ pub struct InitializeTable<'info> {
 }
 
 impl<'info> InitializeTable<'info> {
-    pub fn handler(ctx: Context<InitializeTable>) -> Result<()> {
-        // TODO: just initialize table and round accounts
+    pub fn initialize_table(&mut self, bumps: &InitializeTableBumps) -> Result<()> {
+        // current timestamp
+        let current_timestamp = Clock::get()?.unix_timestamp;
+
+        //  initialize table and round accounts
+        self.table.set_inner(Table {
+            admin: self.admin.key(),
+            minimum_bet_amount: LAMPORTS_PER_SOL / 100,
+            current_round_number: 1,
+            // 90s until the next round.
+            next_round_ts: current_timestamp + 90,
+            round_period_ts: 60,
+            bump: bumps.table,
+            vault_bump: bumps.vault,
+        });
+
+        // initialsing a round
+        self.round.set_inner(Round {
+            round_number: 1,
+            pool_amount: 0,
+            is_spun: false,
+            is_claimed: false,
+            bump: bumps.round,
+            winning_bet: None,
+        });
+
         // TODO: transfer minimum system account rent to vault, to prevent it from being under-rent when winnings are first drawn
+        let min_rent_lamports =
+            Rent::get()?.minimum_balance(self.vault.to_account_info().data_len());
+
+        //cpi for account creation with rent
+        let cpi_ctx = CpiContext::new(
+            self.system_program.to_account_info(),
+            Transfer {
+                from: self.admin.to_account_info(),
+                to: self.vault.to_account_info(),
+            },
+        );
+
+        transfer(cpi_ctx, min_rent_lamports)?;
 
         Ok(())
     }
