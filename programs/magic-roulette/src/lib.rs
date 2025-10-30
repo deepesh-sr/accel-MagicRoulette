@@ -16,7 +16,7 @@ pub mod magic_roulette {
     use super::*;
 
     pub fn initialize_table(ctx: Context<InitializeTable>) -> Result<()> {
-        InitializeTable::handler(ctx)
+        ctx.accounts.initialize_table(&ctx.bumps)
     }
 
     pub fn spin_roulette(ctx: Context<SpinRoulette>) -> Result<()> {
