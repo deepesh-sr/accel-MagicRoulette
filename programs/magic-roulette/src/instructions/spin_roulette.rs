@@ -26,7 +26,7 @@ pub struct SpinRoulette<'info> {
     /// CHECK: MagicBlock default queue
     #[account(
         mut,
-        constraint = oracle_queue.key() == DEFAULT_QUEUE || oracle_queue.key() == DEFAULT_EPHEMERAL_QUEUE @ MagicRouletteError::InvalidQueue
+        constraint = oracle_queue.key() == DEFAULT_QUEUE @ MagicRouletteError::InvalidQueue
     )]
     pub oracle_queue: UncheckedAccount<'info>,
 }
