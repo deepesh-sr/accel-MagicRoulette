@@ -12,9 +12,9 @@ pub struct InitializeTable<'info> {
     pub admin: Signer<'info>,
     /// CHECK: Vault for holding round bet amounts, system account
     #[account(
-        // added admin key for extra security
+
         mut,
-        seeds = [VAULT_SEED, admin.key().as_ref()],
+        seeds = [VAULT_SEED],
         bump,
     )]
     pub vault: UncheckedAccount<'info>,
@@ -45,7 +45,7 @@ impl<'info> InitializeTable<'info> {
         //  initialize table and round accounts
         self.table.set_inner(Table {
             admin: self.admin.key(),
-            minimum_bet_amount: LAMPORTS_PER_SOL / 100,
+            minimum_bet_amount: LAMPORTS_PER_SOL / 100000,
             current_round_number: 1,
             // 90s until the next round.
             next_round_ts: current_timestamp + 90,
