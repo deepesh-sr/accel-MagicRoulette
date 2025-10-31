@@ -7,5 +7,5 @@ pub enum MagicRouletteError {
     #[msg("Bet below minimum bet amount")]
     InvalidBetAmount,
     #[msg("Invalid Round Number")]
-    InvalideRound,
+    InvalidRound,
 }

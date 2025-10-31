@@ -4,7 +4,7 @@ use anchor_lang::prelude::*;
 use anchor_lang::system_program::{transfer, Transfer};
 
 use crate::error::MagicRouletteError;
-use crate::{Bet, BetType, InitializeTableBumps, Round, Table, BET_SEED, TABLE_SEED, VAULT_SEED};
+use crate::{Bet, BetType, Round, Table, BET_SEED, TABLE_SEED, VAULT_SEED};
 
 #[derive(Accounts)]
 pub struct PlaceBet<'info> {
@@ -49,15 +49,13 @@ impl<'info> PlaceBet<'info> {
         // assert table.current_round_number matches round.round_number
         require!(
             self.table.current_round_number == self.round.round_number,
-            MagicRouletteError::InvalideRound
+            MagicRouletteError::InvalidRound
         );
 
         // initialize bet account
         self.bet.set_inner(Bet {
             player: self.player.key(),
-            // table round initially set to 0, after each round table current round will be increemented,
-            // new round = last round + 1
-            round: self.table.current_round_number + 1,
+            round: self.round.round_number,
             amount: bet_amount,
             bump: bumps.bet,
             bet_type,
