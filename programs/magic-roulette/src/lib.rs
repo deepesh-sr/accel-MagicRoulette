@@ -19,16 +19,16 @@ pub mod magic_roulette {
         ctx.accounts.initialize_table(&ctx.bumps)
     }
 
+    pub fn place_bet(ctx: Context<PlaceBet>, bet_amount: u64, bet_type: BetType) -> Result<()> {
+        ctx.accounts.handler(bet_amount, bet_type, &ctx.bumps)
+    }
+
     pub fn spin_roulette(ctx: Context<SpinRoulette>) -> Result<()> {
         SpinRoulette::handler(ctx)
     }
 
     pub fn advance_round(ctx: Context<AdvanceRound>, randomness: [u8; 32]) -> Result<()> {
         AdvanceRound::handler(ctx, randomness)
-    }
-
-    pub fn place_bet(ctx: Context<PlaceBet>, bet_amount: u64, bet_type: BetType) -> Result<()> {
-        PlaceBet::handler(ctx, bet_amount, bet_type)
     }
 
     pub fn claim_winnings(ctx: Context<ClaimWinnings>) -> Result<()> {
