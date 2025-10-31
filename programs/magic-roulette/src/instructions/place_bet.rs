@@ -1,6 +1,10 @@
-use anchor_lang::prelude::*;
+use std::ops::Add;
 
-use crate::{Bet, BetType, Round, Table, BET_SEED, TABLE_SEED, VAULT_SEED};
+use anchor_lang::prelude::*;
+use anchor_lang::system_program::{transfer, Transfer};
+
+use crate::error::MagicRouletteError;
+use crate::{Bet, BetType, InitializeTableBumps, Round, Table, BET_SEED, TABLE_SEED, VAULT_SEED};
 
 #[derive(Accounts)]
 pub struct PlaceBet<'info> {
@@ -31,11 +35,44 @@ pub struct PlaceBet<'info> {
 }
 
 impl<'info> PlaceBet<'info> {
-    pub fn handler(ctx: Context<PlaceBet>, bet_amount: u64, bet_type: BetType) -> Result<()> {
-        // TODO: assert minimum bet amount
-        // TODO: assert table.current_round_number matches round.round_number
-        // TODO: initialize bet account
-        // TODO: transfer bet_amount to vault
+    pub fn handler(
+        &mut self,
+        bet_amount: u64,
+        bet_type: BetType,
+        bumps: &PlaceBetBumps,
+    ) -> Result<()> {
+        // min bet amount
+        require!(
+            bet_amount > self.table.minimum_bet_amount,
+            MagicRouletteError::InvalidBetAmount
+        );
+        // assert table.current_round_number matches round.round_number
+        require!(
+            self.table.current_round_number == self.round.round_number,
+            MagicRouletteError::InvalideRound
+        );
+
+        // initialize bet account
+        self.bet.set_inner(Bet {
+            player: self.player.key(),
+            // table round initially set to 0, after each round table current round will be increemented,
+            // new round = last round + 1
+            round: self.table.current_round_number + 1,
+            amount: bet_amount,
+            bump: bumps.bet,
+            bet_type,
+        });
+
+        // transfer bet_amount to vault
+        let cpi_ctx = CpiContext::new(
+            self.system_program.to_account_info(),
+            Transfer {
+                from: self.player.to_account_info(),
+                to: self.vault.to_account_info(),
+            },
+        );
+
+        transfer(cpi_ctx, bet_amount)?;
 
         Ok(())
     }
