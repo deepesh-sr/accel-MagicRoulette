@@ -30,7 +30,7 @@ pub struct InitializeTable<'info> {
         init,
         payer = admin,
         space = Round::DISCRIMINATOR.len() + Round::INIT_SPACE,
-        seeds = [ROUND_SEED],
+        seeds = [ROUND_SEED, 1_u64.to_le_bytes().as_ref()],
         bump,
     )]
     pub round: Account<'info, Round>,
