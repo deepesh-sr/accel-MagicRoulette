@@ -37,6 +37,6 @@ pub mod magic_roulette {
     }
 
     pub fn claim_winnings(ctx: Context<ClaimWinnings>) -> Result<()> {
-        ClaimWinnings::handler(ctx)
+        ctx.accounts.handler()
     }
 }

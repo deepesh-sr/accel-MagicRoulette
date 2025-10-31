@@ -49,7 +49,7 @@ impl<'info> PlaceBet<'info> {
         // assert table.current_round_number matches round.round_number
         require!(
             self.table.current_round_number == self.round.round_number,
-            MagicRouletteError::InvalidRound
+            MagicRouletteError::InvalidRoundNumber
         );
 
         // initialize bet account
