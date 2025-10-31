@@ -45,6 +45,8 @@ impl<'info> SpinRoulette<'info> {
             MagicRouletteError::RoundNotReadyToSpin
         );
 
+        self.current_round.is_spun = true;
+
         let seed = self.current_round.round_number as u8;
 
         let ix = create_request_randomness_ix(RequestRandomnessParams {
