@@ -18,4 +18,12 @@ pub enum MagicRouletteError {
     RoundNotReadyToSpin,
     #[msg("Unable to map randomness to valid BetType")]
     InvalidRandomness,
+    #[msg("Length of remaining accounts must be even")]
+    InsufficientRemainingAccounts,
+    #[msg("Bet does not match")]
+    InvalidBet,
+    #[msg("Bet player does not match")]
+    InvalidBetPlayer,
+    #[msg("Bet round does not match")]
+    InvalidBetRound,
 }

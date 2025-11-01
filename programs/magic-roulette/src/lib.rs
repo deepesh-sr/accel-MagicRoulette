@@ -2,6 +2,7 @@ pub mod constants;
 pub mod error;
 pub mod instructions;
 pub mod state;
+pub mod utils;
 
 use anchor_lang::prelude::*;
 
@@ -36,7 +37,10 @@ pub mod magic_roulette {
         ctx.accounts.handler(&ctx.bumps, randomness)
     }
 
-    pub fn claim_winnings(ctx: Context<ClaimWinnings>) -> Result<()> {
-        ctx.accounts.handler()
+    pub fn claim_winnings<'info>(
+        ctx: Context<'_, '_, '_, 'info, ClaimWinnings<'info>>,
+    ) -> Result<()> {
+        // ctx.accounts.handler()
+        ClaimWinnings::handler(ctx)
     }
 }
