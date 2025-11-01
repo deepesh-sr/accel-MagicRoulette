@@ -6,8 +6,8 @@ import { Program } from "@coral-xyz/anchor";
 import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { fundedSystemAccountInfo, getSetup } from "./setup";
 import { BN } from "bn.js";
-import { getTablePda } from "./pda";
-import { fetchTableAcc } from "./accounts";
+import { getRoundPda, getTablePda } from "./pda";
+import { fetchRoundAcc, fetchTableAcc } from "./accounts";
 
 describe("magic-roulette", () => {
   let { litesvm, provider, program } = {} as {
@@ -52,8 +52,42 @@ describe("magic-roulette", () => {
     expect(tableAcc.roundPeriodTs.toNumber()).toBe(roundPeriodTs);
   });
 
-  test.skip("place bet as player1 and player2", async () => {
+  test("place bet as player1 and player2", async () => {
     // TODO
+    let betAmount1 = new BN(10000);
+    const bet_type_1 = { straightUp: {} };
+    let roundNumber = new BN(1);
+
+    const roundPDA = getRoundPda(roundNumber);
+
+    await program.methods
+      .placeBet(betAmount1, bet_type_1)
+      .accounts({
+        player: player1.publicKey,
+        round: roundPDA,
+      })
+      .signers([player1])
+      .rpc();
+
+    let betAmount2 = new BN(10000);
+    const bet_type_2 = { red: {} };
+
+    await program.methods
+      .placeBet(betAmount2, bet_type_2)
+      .accounts({
+        player: player2.publicKey,
+        round: roundPDA,
+      })
+      .signers([player2])
+      .rpc();
+
+    const roundAccount = await fetchRoundAcc(program, roundPDA);
+
+    expect(roundAccount.poolAmount.toNumber()).toBe(
+      betAmount1.toNumber() + betAmount2.toNumber()
+    );
+    expect(roundAccount.isClaimed).toBe(false);
+    expect(roundAccount.isSpun).toBe(false);
   });
 
   test.skip("spin the roulette", async () => {
