@@ -24,6 +24,7 @@ describe("magic-roulette", () => {
   );
 
   const tablePda = magicRouletteClient.getTablePda();
+  const vaultPda = magicRouletteClient.getVaultPda();
 
   beforeAll(async () => {
     // fund each account used in testing
@@ -42,10 +43,10 @@ describe("magic-roulette", () => {
       tablePda,
       "table"
     );
-
     // table is a singleton, so this test only succeeds once per program deployed on a cluster
     if (tableAcc !== null) {
       console.log("Table already initialized, skipping...");
+      console.log(tableAcc);
       return;
     }
 
@@ -62,6 +63,7 @@ describe("magic-roulette", () => {
 
     tableAcc = await magicRouletteClient.fetchProgramAccount(tablePda, "table");
 
+    console.log(tableAcc);
     expect(tableAcc.admin).toStrictEqual(admin.publicKey);
     expect(tableAcc.minimumBetAmount.toNumber()).toBe(minimumBetAmount);
     expect(tableAcc.roundPeriodTs.toNumber()).toBe(roundPeriodTs);
@@ -69,11 +71,11 @@ describe("magic-roulette", () => {
 
   test("place bet as player1 and player2", async () => {
     // TODO
+    let roundNumber = new BN(1);
+    const roundPDA = magicRouletteClient.getRoundPda(roundNumber);
+
     let betAmount1 = new BN(10000);
     const bet_type_1 = { straightUp: {} };
-    let roundNumber = new BN(1);
-
-    const roundPDA = magicRouletteClient.getRoundPda(roundNumber);
 
     await program.methods
       .placeBet(betAmount1, bet_type_1)
