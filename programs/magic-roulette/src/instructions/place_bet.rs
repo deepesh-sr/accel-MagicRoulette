@@ -11,7 +11,7 @@ pub struct PlaceBet<'info> {
     #[account(
         mut,
         seeds = [VAULT_SEED],
-        bump = table.bump
+        bump = table.vault_bump
     )]
     pub vault: SystemAccount<'info>,
     #[account(

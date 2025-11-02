@@ -27,14 +27,14 @@ describe("magic-roulette", () => {
 
   beforeAll(async () => {
     // fund each account used in testing
-    [admin, player1, player2].forEach(async (kp) => {
+    for (const kp of [admin, player1, player2]) {
       await fundAccount(
         provider.connection,
         wallet.payer,
         kp.publicKey,
         LAMPORTS_PER_SOL * 0.1
       );
-    });
+    }
   });
 
   test("initialize table", async () => {
@@ -122,14 +122,20 @@ describe("magic-roulette", () => {
 
   afterAll(async () => {
     // defund all accounts used in testing
-    [admin, player1, player2].forEach(async (kp) => {
-      const balance = await provider.connection.getBalance(kp.publicKey);
-      await fundAccount(
-        provider.connection,
-        kp,
-        wallet.publicKey,
-        balance - 5000
-      );
-    });
+    for (const kp of [admin, player1, player2]) {
+      try {
+        const balance = await provider.connection.getBalance(kp.publicKey);
+        if (balance > 5000) {
+          await fundAccount(
+            provider.connection,
+            kp,
+            wallet.publicKey,
+            balance - 5000
+          );
+        }
+      } catch (error) {
+        console.log(`Failed to defund account: ${error}`);
+      }
+    }
   });
 });

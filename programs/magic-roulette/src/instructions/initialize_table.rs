@@ -18,7 +18,7 @@ pub struct InitializeTable<'info> {
     )]
     pub vault: UncheckedAccount<'info>,
     #[account(
-        init,
+        init_if_needed,
         payer = admin,
         space = Table::DISCRIMINATOR.len()+ Table::INIT_SPACE,
         seeds = [TABLE_SEED],
