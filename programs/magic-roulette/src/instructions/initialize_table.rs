@@ -11,8 +11,9 @@ pub struct InitializeTable<'info> {
     pub admin: Signer<'info>,
     /// CHECK: Vault for holding round bet amounts, system account
     #[account(
-
-        mut,
+        init_if_needed,
+        payer = admin,
+        space = 0,
         seeds = [VAULT_SEED],
         bump,
     )]
