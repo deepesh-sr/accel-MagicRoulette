@@ -47,6 +47,8 @@ impl<'info> InitializeTable<'info> {
             MagicRouletteError::InvalidMinimumBetAmount
         );
 
+        require!(round_period_ts > 0, MagicRouletteError::InvalidRoundPeriod);
+
         let now = Clock::get()?.unix_timestamp;
 
         self.table.set_inner(Table {
