@@ -23,12 +23,14 @@ pub struct SpinRoulette<'info> {
         bump = current_round.bump
     )]
     pub current_round: Account<'info, Round>,
-    /// CHECK: uninitialized, will be initialized in advance_round
     #[account(
+        init,
+        payer = payer,
+        space = Round::DISCRIMINATOR.len() + Round::INIT_SPACE,
         seeds = [ROUND_SEED, (current_round.round_number + 1).to_le_bytes().as_ref()],
         bump,
     )]
-    pub new_round: UncheckedAccount<'info>,
+    pub new_round: Account<'info, Round>,
     /// CHECK: MagicBlock default queue
     #[account(
         mut,
@@ -38,7 +40,7 @@ pub struct SpinRoulette<'info> {
 }
 
 impl<'info> SpinRoulette<'info> {
-    pub fn handler(&mut self) -> Result<()> {
+    pub fn handler(&mut self, bumps: &SpinRouletteBumps) -> Result<()> {
         let now = Clock::get()?.unix_timestamp;
 
         require!(
@@ -47,6 +49,16 @@ impl<'info> SpinRoulette<'info> {
         );
 
         self.current_round.is_spun = true;
+
+        // new_round can't be initialized in callback, so it's initialized here
+        self.new_round.set_inner(Round {
+            bump: bumps.new_round,
+            is_claimed: false,
+            is_spun: false,
+            pool_amount: 0,
+            round_number: self.table.current_round_number + 1,
+            winning_bet: None,
+        });
 
         let seed = self.current_round.round_number as u8;
 
@@ -57,11 +69,6 @@ impl<'info> SpinRoulette<'info> {
             callback_discriminator: instruction::AdvanceRound::DISCRIMINATOR.to_vec(),
             caller_seed: [seed; 32],
             accounts_metas: Some(vec![
-                SerializableAccountMeta {
-                    pubkey: self.payer.key(),
-                    is_signer: true,
-                    is_writable: true,
-                },
                 SerializableAccountMeta {
                     pubkey: self.table.key(),
                     is_signer: false,

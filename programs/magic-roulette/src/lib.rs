@@ -39,11 +39,11 @@ pub mod magic_roulette {
     }
 
     pub fn spin_roulette(ctx: Context<SpinRoulette>) -> Result<()> {
-        ctx.accounts.handler()
+        ctx.accounts.handler(&ctx.bumps)
     }
 
     pub fn advance_round(ctx: Context<AdvanceRound>, randomness: [u8; 32]) -> Result<()> {
-        ctx.accounts.handler(&ctx.bumps, randomness)
+        ctx.accounts.handler(randomness)
     }
 
     pub fn claim_winnings<'info>(
