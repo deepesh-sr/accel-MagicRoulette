@@ -52,10 +52,11 @@ impl<'info> ClaimWinnings<'info> {
 
             let bet = Bet::try_deserialize(&mut &bet_account.data.borrow()[..])?;
             let player_key = player.key();
+            let round_key = round_account.key();
             let bet_seeds = &[
                 BET_SEED,
                 player_key.as_ref(),
-                &round.round_number.to_le_bytes(),
+                round_key.as_ref(),
                 &[bet.bump],
             ];
             let bet_pda = Pubkey::create_program_address(bet_seeds, &ID).unwrap();
