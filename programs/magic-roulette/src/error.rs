@@ -28,4 +28,6 @@ pub enum MagicRouletteError {
     BetNotWinning,
     #[msg("Minimum bet amount must be greater than zero")]
     InvalidMinimumBetAmount,
+    #[msg("Round period must be greater than zero")]
+    InvalidRoundPeriod,
 }
