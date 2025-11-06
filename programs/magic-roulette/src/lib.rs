@@ -25,6 +25,10 @@ pub mod magic_roulette {
             .initialize_table(&ctx.bumps, minimum_bet_amount, round_period_ts)
     }
 
+    pub fn update_table(ctx: Context<UpdateTable>, args: UpdateTableArgs) -> Result<()> {
+        ctx.accounts.update_table(args)
+    }
+
     pub fn place_bet(ctx: Context<PlaceBet>, bet_amount: u64, bet_type: BetType) -> Result<()> {
         ctx.accounts.handler(bet_amount, bet_type, &ctx.bumps)
     }
