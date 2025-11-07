@@ -1,8 +1,8 @@
 'use client';
 
 import { CLUSTER } from '@/lib/client/solana';
+import { getExplorerLink } from '@/lib/utils';
 import { CuPriceRange } from '@/types/transactions';
-import { getExplorerLink } from '@solana-developers/helpers';
 import {
   createContext,
   ReactNode,
