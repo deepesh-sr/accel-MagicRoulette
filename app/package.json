@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@jup-ag/wallet-adapter": "^0.2.5",
-    "@solana-developers/helpers": "2.8.0",
     "@solana/wallet-adapter-react": "^0.15.39",
     "next": "16.0.1",
     "react": "19.2.0",
