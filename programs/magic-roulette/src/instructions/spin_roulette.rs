@@ -51,14 +51,10 @@ impl<'info> SpinRoulette<'info> {
         self.current_round.is_spun = true;
 
         // new_round can't be initialized in callback, so it's initialized here
-        self.new_round.set_inner(Round {
-            bump: bumps.new_round,
-            is_claimed: false,
-            is_spun: false,
-            pool_amount: 0,
-            round_number: self.table.current_round_number + 1,
-            winning_bet: None,
-        });
+        self.new_round.set_inner(Round::new(
+            self.table.current_round_number + 1,
+            bumps.new_round,
+        ));
 
         let seed = self.current_round.round_number as u8;
 
