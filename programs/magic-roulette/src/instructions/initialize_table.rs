@@ -61,14 +61,7 @@ impl<'info> InitializeTable<'info> {
             vault_bump: bumps.vault,
         });
 
-        self.round.set_inner(Round {
-            round_number: 1,
-            pool_amount: 0,
-            is_spun: false,
-            is_claimed: false,
-            bump: bumps.round,
-            winning_bet: None,
-        });
+        self.round.set_inner(Round::new(1, bumps.round));
 
         let min_rent_lamports = Rent::get()?.minimum_balance(0);
 

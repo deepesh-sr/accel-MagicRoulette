@@ -21,3 +21,17 @@ pub struct Round {
     /// None if no winning bet has been determined yet.
     pub winning_bet: Option<BetType>,
 }
+
+impl Round {
+    pub fn new(round_number: u64, bump: u8) -> Self {
+        Self {
+            round_number,
+            pool_amount: 0,
+            is_spun: false,
+            is_claimed: false,
+            bump,
+            bet_outcome: None,
+            winning_bet: None,
+        }
+    }
+}
