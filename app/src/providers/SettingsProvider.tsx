@@ -20,7 +20,7 @@ enum Explorer {
 
 type PriorityFee = CuPriceRange;
 
-enum RpcType {
+export enum RpcType {
   Default = 'default',
   Custom = 'custom',
 }
