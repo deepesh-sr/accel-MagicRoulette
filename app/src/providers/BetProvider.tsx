@@ -31,7 +31,7 @@ export function BetProvider({
     isLoading: betLoading,
     mutate: betMutate,
   } = useSWR({ apiEndpoint, pda }, async ({ apiEndpoint, pda }) => {
-    return (await wrappedFetch(`${apiEndpoint}?pda=${pda}`)).item as ParsedBet;
+    return (await wrappedFetch(`${apiEndpoint}?pda=${pda}`)).bet as ParsedBet;
   });
 
   return (
