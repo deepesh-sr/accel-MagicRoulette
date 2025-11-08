@@ -736,6 +736,13 @@ export type MagicRoulette = {
                 "name": "betType"
               }
             }
+          },
+          {
+            "name": "isClaimed",
+            "docs": [
+              "Boolean that indicates if the prize for a winning bet has been claimed."
+            ],
+            "type": "bool"
           }
         ]
       }
