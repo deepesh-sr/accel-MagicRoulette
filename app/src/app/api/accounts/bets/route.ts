@@ -1,5 +1,6 @@
 import { DISCRIMINATOR_SIZE } from '@/lib/constants';
 import { MAGIC_ROULETTE_CLIENT } from '@/lib/server/solana';
+import { boolToByte } from '@/lib/utils';
 import { parseBet } from '@/types/accounts';
 import { GetProgramAccountsFilter } from '@solana/web3.js';
 import { NextRequest, NextResponse } from 'next/server';
@@ -9,8 +10,8 @@ export async function GET(req: NextRequest) {
 
   const pdas = searchParams.getAll('pda');
   const roundPda = searchParams.get('round');
-  const betType = searchParams.get('betType');
   const player = searchParams.get('player');
+  const isClaimed = searchParams.get('isClaimed');
 
   try {
     if (!pdas.length) {
@@ -36,12 +37,12 @@ export async function GET(req: NextRequest) {
         });
       }
 
-      if (betType) {
+      if (isClaimed) {
         filters.push({
           memcmp: {
-            offset: DISCRIMINATOR_SIZE + 32 + 32 + 8 + 1,
-            bytes: betType,
-            encoding: 'base58',
+            offset: DISCRIMINATOR_SIZE + 32 + 32 + 8 + 1 + 7,
+            bytes: boolToByte(isClaimed.toLowerCase() === 'true'),
+            encoding: 'base64',
           },
         });
       }

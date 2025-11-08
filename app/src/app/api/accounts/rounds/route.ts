@@ -1,9 +1,10 @@
 import { DISCRIMINATOR_SIZE } from '@/lib/constants';
 import { MAGIC_ROULETTE_CLIENT } from '@/lib/server/solana';
-import { boolToByte } from '@/lib/utils';
+import { BNtoBase64, boolToByte } from '@/lib/utils';
 import { parseRound } from '@/types/accounts';
 import { GetProgramAccountsFilter } from '@solana/web3.js';
 import { NextRequest, NextResponse } from 'next/server';
+import { BN } from '@coral-xyz/anchor';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -11,8 +12,6 @@ export async function GET(req: NextRequest) {
   const pdas = searchParams.getAll('pda');
   const roundNumber = searchParams.get('roundNumber');
   const isSpun = searchParams.get('isSpun');
-  const isClaimed = searchParams.get('isClaimed');
-  const winningBet = searchParams.get('winningBet');
 
   try {
     if (!pdas.length) {
@@ -22,8 +21,8 @@ export async function GET(req: NextRequest) {
         filters.push({
           memcmp: {
             offset: DISCRIMINATOR_SIZE,
-            bytes: roundNumber,
-            encoding: 'base58',
+            bytes: BNtoBase64(new BN(roundNumber)),
+            encoding: 'base64',
           },
         });
       }
@@ -32,29 +31,8 @@ export async function GET(req: NextRequest) {
         filters.push({
           memcmp: {
             offset: DISCRIMINATOR_SIZE + 8 + 8,
-            bytes: boolToByte(Boolean(isSpun)),
-            encoding: 'base58',
-          },
-        });
-      }
-
-      if (isClaimed) {
-        filters.push({
-          memcmp: {
-            offset: DISCRIMINATOR_SIZE + 8 + 8 + 1,
-            bytes: boolToByte(Boolean(isClaimed)),
-            encoding: 'base58',
-          },
-        });
-      }
-
-      // filters for round with winning_bet set
-      if (winningBet) {
-        filters.push({
-          memcmp: {
-            offset: DISCRIMINATOR_SIZE + 8 + 8 + 1 + 1 + 1 + 1,
-            bytes: winningBet,
-            encoding: 'base58',
+            bytes: boolToByte(isSpun.toLowerCase() === 'true'),
+            encoding: 'base64',
           },
         });
       }
