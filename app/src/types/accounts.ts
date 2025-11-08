@@ -42,6 +42,7 @@ export interface ParsedBet extends ParsedProgramAccount {
   round: pubkey;
   amount: u64;
   betType: BetType;
+  isClaimed: boolean;
 }
 
 function parsePublicKey(field: PublicKey | null): string {
@@ -93,11 +94,13 @@ export function parseBet({
   betType,
   player,
   round,
+  isClaimed,
 }: Bet): Omit<ParsedBet, 'publicKey'> {
   return {
     amount: parseBN(amount),
     betType,
     player: parsePublicKey(player),
     round: parsePublicKey(round),
+    isClaimed,
   };
 }

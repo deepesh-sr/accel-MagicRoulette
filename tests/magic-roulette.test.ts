@@ -275,10 +275,6 @@ describe("magic-roulette", () => {
           );
 
           expect(prePlayerBal).toBeLessThan(postPlayerBal);
-
-          const betAccBal = await provider.connection.getBalance(betPda);
-
-          expect(betAccBal).toBe(0);
         }
       })
     );
