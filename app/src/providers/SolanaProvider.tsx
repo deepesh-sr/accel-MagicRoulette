@@ -1,7 +1,6 @@
 'use client';
 
-import { ConnectionProvider } from '@solana/wallet-adapter-react';
-import { UnifiedWalletProvider } from '@jup-ag/wallet-adapter';
+import { UnifiedWalletProvider, ConnectionProvider } from '@jup-ag/wallet-adapter';
 import { ReactNode } from 'react';
 import { CLUSTER } from '@/lib/client/solana';
 import { toast } from 'sonner';
