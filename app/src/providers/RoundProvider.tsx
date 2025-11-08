@@ -31,7 +31,7 @@ export function RoundProvider({
     isLoading: roundLoading,
     mutate: roundMutate,
   } = useSWR({ apiEndpoint, pda }, async ({ apiEndpoint, pda }) => {
-    return (await wrappedFetch(`${apiEndpoint}?pda=${pda}`)).item as ParsedRound;
+    return (await wrappedFetch(`${apiEndpoint}?pda=${pda}`)).round as ParsedRound;
   });
 
   return (
