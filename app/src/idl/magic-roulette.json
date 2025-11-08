@@ -730,6 +730,13 @@
                 "name": "BetType"
               }
             }
+          },
+          {
+            "name": "is_claimed",
+            "docs": [
+              "Boolean that indicates if the prize for a winning bet has been claimed."
+            ],
+            "type": "bool"
           }
         ]
       }
