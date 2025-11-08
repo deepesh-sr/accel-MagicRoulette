@@ -1,6 +1,7 @@
 import { Cluster, VersionedTransaction } from "@solana/web3.js";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { BN } from "@coral-xyz/anchor";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -12,7 +13,11 @@ export function v0TxToBase64(tx: VersionedTransaction): string {
 }
 
 export function boolToByte(value: boolean): string {
-  return value ? '1' : '0';
+  return Buffer.from([value ? 1 : 0]).toString('base64');
+}
+
+export function BNtoBase64(bn: BN): string {
+  return bn.toArrayLike(Buffer, 'le', 8).toString('base64');
 }
 
 // https://github.com/solana-developers/helpers/blob/main/src/lib/explorer.ts#L20
