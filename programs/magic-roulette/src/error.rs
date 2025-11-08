@@ -36,4 +36,6 @@ pub enum MagicRouletteError {
     InsufficientVaultFunds,
     #[msg("Bet type is illegal")]
     InvalidBetType,
+    #[msg("Winnings have already been claimed for this bet")]
+    WinningsAlreadyClaimed,
 }

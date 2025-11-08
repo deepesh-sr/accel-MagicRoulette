@@ -347,4 +347,6 @@ pub struct Bet {
     pub amount: u64,
     pub bump: u8,
     pub bet_type: BetType,
+    /// Boolean that indicates if the prize for a winning bet has been claimed.
+    pub is_claimed: bool,
 }

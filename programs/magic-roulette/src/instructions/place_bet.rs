@@ -68,6 +68,7 @@ impl<'info> PlaceBet<'info> {
             amount: bet_amount,
             bump: bumps.bet,
             bet_type,
+            is_claimed: false,
         });
 
         transfer(

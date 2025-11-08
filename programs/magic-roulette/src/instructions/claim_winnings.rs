@@ -50,7 +50,7 @@ impl<'info> ClaimWinnings<'info> {
                 MagicRouletteError::InvalidRound
             );
 
-            let bet = Bet::try_deserialize(&mut &bet_account.data.borrow_mut()[..])?;
+            let mut bet = Bet::try_deserialize(&mut &bet_account.data.borrow_mut()[..])?;
             let round_key = round_account.key();
             let player_key = player.key();
             let bet_seeds = &[
@@ -70,6 +70,7 @@ impl<'info> ClaimWinnings<'info> {
                 ),
                 MagicRouletteError::BetNotWinning
             );
+            require!(!bet.is_claimed, MagicRouletteError::WinningsAlreadyClaimed);
 
             // payout = original bet amount * multiplier + original bet amount
             let bet_payout = bet
@@ -98,7 +99,10 @@ impl<'info> ClaimWinnings<'info> {
                 bet_payout,
             )?;
 
-            close(bet_account.to_account_info(), player.to_account_info())?;
+            bet.is_claimed = true;
+
+            let mut data = bet_account.try_borrow_mut_data()?;
+            bet.serialize(&mut &mut data[Bet::DISCRIMINATOR.len()..])?;
         }
 
         // length of remaining accounts must be even
