@@ -1,5 +1,5 @@
 import { MagicRouletteClient } from '@/lib/magic-roulette-client';
-import { useConnection } from '@solana/wallet-adapter-react';
+import { useConnection } from '@jup-ag/wallet-adapter';
 import { createContext, ReactNode, useContext, useMemo } from 'react';
 
 interface ProgramContextType {
