@@ -1,4 +1,4 @@
-import { AmericanRoulette } from "@/components/RouletteTable";
+import { RouletteTable } from "@/components/RouletteTable";
 import React from "react";
 
 const page = () => {
@@ -15,7 +15,7 @@ const page = () => {
 
     //                     </div>
     // </div>
-    <AmericanRoulette />
+    <RouletteTable />
   );
 };
 
