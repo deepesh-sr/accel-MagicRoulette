@@ -39,7 +39,8 @@ export function RouletteTable() {
     if ("odd" in bet) return "Odd";
     if ("high" in bet) return "High (19-36)";
     if ("low" in bet) return "Low (1-18)";
-    return "Unknown bet type";
+
+    throw new Error("Unknown bet type.");
   };
 
   return (
@@ -308,12 +309,6 @@ export function RouletteTable() {
           <div className="flex flex-wrap gap-2">
             <div className="bg-green-900 text-white px-3 py-1 rounded border border-yellow-600 text-sm flex items-center gap-2">
               <span>{formatBet(selectedBet)}</span>
-              <button
-                onClick={() => setSelectedBet(null)}
-                className="text-red-400 hover:text-red-300 font-bold"
-              >
-                ×
-              </button>
             </div>
           </div>
         </div>
