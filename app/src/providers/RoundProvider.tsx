@@ -57,29 +57,43 @@ export function RoundProvider({
 
   const hasRoundEnded = roundEndsInSecs <= 0;
 
-  const handleRoundOutcome = useCallback(async (acc: AccountInfo<Buffer<ArrayBufferLike>>, id: number) => {
+  const handleRoundChange = useCallback(async (acc: AccountInfo<Buffer<ArrayBufferLike>>) => {
     const round = magicRouletteClient.program.coder.accounts.decode<Round>('round', acc.data);
 
-    if (round.outcome) {
+    if (!round.isSpun) {
+      // pool amount has changed
+      await roundMutate(
+        (prev) => {
+          if (!prev) {
+            throw new Error("Round should not be null.");
+          }
+
+          return {
+            ...prev,
+            poolAmount: round.poolAmount.toString(),
+          };
+        }
+      );
+    } else if (round.outcome) {
+      // round outcome has been set
       setLastRoundOutcome(round.outcome);
 
       await tableMutate(
         (prev) => {
           if (!prev) {
-            throw new Error("Table should not be null");
+            throw new Error("Table should not be null.`");
           }
 
           return {
             ...prev,
+            // changing currentRoundNumber will destroy and render a new RoundProvider
             currentRoundNumber: (Number(prev.currentRoundNumber) + 1).toString(),
             nextRoundTs: (Number(prev.nextRoundTs) + Number(prev.roundPeriodTs)).toString(),
           }
         }
       );
-
-      connection.removeAccountChangeListener(id);
     }
-  }, [connection, magicRouletteClient, tableMutate]);
+  }, [magicRouletteClient, tableMutate, roundMutate]);
 
   // initial fetch of last round outcome
   useEffect(() => {
@@ -90,7 +104,7 @@ export function RoundProvider({
         const lastRoundAcc = await magicRouletteClient.fetchProgramAccount(lastRoundPda, "round", parseRound);
 
         if (!lastRoundAcc) {
-          throw new Error("Last round account not found");
+          throw new Error("Last round account not found.");
         }
 
         setLastRoundOutcome(lastRoundAcc.outcome);
@@ -99,16 +113,12 @@ export function RoundProvider({
   }, [tableData, magicRouletteClient, lastRoundOutcome])
 
   useEffect(() => {
-    let id: number;
-
-    if (roundData && hasRoundEnded) {
-      id = connection.onAccountChange(new PublicKey(roundData.publicKey), (acc) => handleRoundOutcome(acc, id));
-    }
+    const id = connection.onAccountChange(new PublicKey(pda), (acc) => handleRoundChange(acc));
 
     return () => {
       connection.removeAccountChangeListener(id);
     }
-  }, [connection, roundData, handleRoundOutcome, hasRoundEnded]);
+  }, [connection, roundData, handleRoundChange, pda]);
 
 
   return (
