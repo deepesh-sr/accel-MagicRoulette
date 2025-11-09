@@ -3,7 +3,7 @@
 import { BetType } from "@/types/accounts";
 import { useState } from "react";
 
-export function AmericanRoulette() {
+export function RouletteTable() {
   const [selectedBets, setSelectedBets] = useState<BetType[]>([]);
 
   const numbers = [
