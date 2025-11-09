@@ -304,14 +304,6 @@ export function RouletteTable() {
         >
           Clear Bets
         </button>
-        <button
-          onClick={() =>
-            alert("Spinning! Bets: " + JSON.stringify(selectedBet))
-          }
-          className="bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-3 px-8 rounded-lg transition"
-        >
-          Spin
-        </button>
       </div>
 
       {selectedBet && (
