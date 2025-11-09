@@ -12,7 +12,6 @@ import { BN } from "bn.js";
 import { MagicRouletteClient } from "./client";
 import idl from "../target/idl/magic_roulette.json";
 import { defundAccount, fundAccounts, skipBetAccIfExists } from "./utils";
-import { DEFAULT_QUEUE } from "./constants";
 import { sleep } from "bun";
 import { isWinner } from "./bet-type";
 
