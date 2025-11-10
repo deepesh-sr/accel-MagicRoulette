@@ -230,11 +230,12 @@ function InsideBetButton({
     <Tooltip>
       <TooltipTrigger asChild>
         <Badge
+          variant={"outline"}
           className={cn(
             "cursor-pointer text-xs font-semibold transition-opacity z-2 absolute rounded-full tabular-nums size-5 p-1",
             isSelected
               ? "bg-yellow-600 hover:bg-yellow-600 text-white"
-              : "bg-white hover:bg-white/80 text-black",
+              : "bg-white hover:bg-primary/90 text-black",
             className
           )}
           onClick={onClick}
