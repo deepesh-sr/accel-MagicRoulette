@@ -7,8 +7,12 @@ import { useProgram } from "@/providers/ProgramProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import { BetType } from "@/types/accounts";
 import { useConnection, useUnifiedWallet } from "@jup-ag/wallet-adapter";
-import { useCallback, useState } from "react";
+import { ReactNode, useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "./ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { capitalizeFirstLetter, cn } from "@/lib/utils";
+import { Badge } from "./ui/badge";
 
 const tableNumbers = [
   [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36],
@@ -19,6 +23,229 @@ const tableNumbers = [
 const redNumbers = [
   1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36,
 ];
+
+function formatBet(betType: BetType): string {
+  if ("straightUp" in betType) {
+    const number = betType.straightUp?.number;
+    return `Straight: ${number === 37 ? "00" : number}`;
+  } else if ("split" in betType) {
+    return `Split: ${betType.split?.numbers.join("-")}`;
+  } else if ("street" in betType) {
+    return `Street: ${betType.street?.numbers.join("-")}`;
+  } else if ("corner" in betType) {
+    return `Corner: ${betType.corner?.numbers.join("-")}`;
+  } else if ("fiveNumber" in betType) {
+    return "Five Number";
+  } else if ("line" in betType) {
+    return `Line: ${betType.line?.numbers.join("-")}`;
+  } else if ("column" in betType) {
+    return `Column: ${betType.column?.column}`;
+  } else if ("dozen" in betType) {
+    return `Dozen: ${betType.dozen?.dozen}`;
+  } else if ("red" in betType) {
+    return "Red";
+  } else if ("black" in betType) {
+    return "Black";
+  } else if ("even" in betType) {
+    return "Even";
+  } else if ("odd" in betType) {
+    return "Odd";
+  } else if ("high" in betType) {
+    return "High";
+  } else if ("low" in betType) {
+    return "Low";
+  } else {
+    throw new Error("Invalid bet type.");
+  }
+}
+
+function BaseButton({
+  className,
+  tooltipText,
+  selected = false,
+  onClick,
+  children,
+}: {
+  className?: string;
+  tooltipText: string;
+  selected?: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant={"default"}
+          className={cn(
+            "cursor-pointer rounded-none border border-white font-bold size-12",
+            className,
+            selected ? "bg-yellow-600 hover:bg-yellow-600 text-white" : ""
+          )}
+          onClick={onClick}
+        >
+          {children}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>{tooltipText}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+function NumberButton({
+  number,
+  isSelected = false,
+  onClick,
+}: {
+  number: number;
+  isSelected?: boolean;
+  onClick: () => void;
+}) {
+  const isRed = redNumbers.includes(number);
+
+  return (
+    <BaseButton
+      className={`${cn(
+        "text-white relative",
+        isRed ? "bg-red-600" : "bg-black"
+      )}`}
+      tooltipText={`Straight: ${number}`}
+      selected={isSelected}
+      onClick={onClick}
+    >
+      {number}
+    </BaseButton>
+  );
+}
+
+function ColumnButton({
+  number,
+  isSelected = false,
+  onClick,
+}: {
+  number: number;
+  isSelected?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <BaseButton
+      className={cn("bg-green-600 text-white")}
+      tooltipText={`Column: ${number}`}
+      selected={isSelected}
+      onClick={onClick}
+    >
+      2 to 1
+    </BaseButton>
+  );
+}
+
+function ZeroButton({
+  value,
+  isSelected = false,
+  onClick,
+}: {
+  value: string;
+  isSelected?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <BaseButton
+      className={cn("text-white bg-green-600 w-12 h-18")}
+      tooltipText={`Straight: ${value}`}
+      selected={isSelected}
+      onClick={onClick}
+    >
+      {value}
+    </BaseButton>
+  );
+}
+
+function DozenButton({
+  value,
+  isSelected = false,
+  onClick,
+}: {
+  value: number;
+  isSelected?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <BaseButton
+      className={"bg-green-600 text-white h-12 w-48"}
+      tooltipText={`Dozen: ${value}`}
+      selected={isSelected}
+      onClick={onClick}
+    >
+      {value === 1 ? "1st" : value === 2 ? "2nd" : "3rd"} 12
+    </BaseButton>
+  );
+}
+
+function BottomButton({
+  value,
+  isSelected = false,
+  onClick,
+}: {
+  value: string;
+  isSelected?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <BaseButton
+      className={cn(
+        " text-white h-12 w-24",
+        value === "red"
+          ? "bg-red-500"
+          : value === "black"
+          ? "bg-black"
+          : "bg-green-600"
+      )}
+      tooltipText={capitalizeFirstLetter(value)}
+      selected={isSelected}
+      onClick={onClick}
+    >
+      {value === "low"
+        ? "1-18"
+        : value === "high"
+        ? "19-36"
+        : capitalizeFirstLetter(value)}
+    </BaseButton>
+  );
+}
+
+function InsideBetButton({
+  label,
+  tooltipText,
+  isSelected = false,
+  onClick,
+  className,
+}: {
+  label: string;
+  tooltipText: string;
+  isSelected?: boolean;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Badge
+          className={cn(
+            "cursor-pointer text-xs font-semibold transition-opacity z-2 absolute rounded-full tabular-nums size-5 p-1",
+            isSelected
+              ? "bg-yellow-600 hover:bg-yellow-600 text-white"
+              : "bg-white hover:bg-white/80 text-black",
+            className
+          )}
+          onClick={onClick}
+        >
+          {label}
+        </Badge>
+      </TooltipTrigger>
+      <TooltipContent>{tooltipText}</TooltipContent>
+    </Tooltip>
+  );
+}
 
 export function RouletteTable() {
   const { connection } = useConnection();
@@ -32,40 +259,13 @@ export function RouletteTable() {
   } = useTransaction();
   const [selectedBet, setSelectedBet] = useState<BetType | null>(null);
 
-  const getNumberColor = (num: number) => {
-    if (num === 0 || num === 37) return "bg-green-600";
-    return redNumbers.includes(num) ? "bg-red-600" : "bg-black";
-  };
-
-  function formatBet() {
+  const formattedBet = useMemo(() => {
     if (!selectedBet) {
-      throw new Error("No bet selected.");
+      return "";
     }
 
-    if ("straightUp" in selectedBet)
-      return `Straight: ${
-        selectedBet.straightUp?.number === 37
-          ? "00"
-          : selectedBet.straightUp?.number
-      }`;
-    if ("split" in selectedBet)
-      return `Split: ${selectedBet.split?.numbers?.join("-")}`;
-    if ("street" in selectedBet)
-      return `Street: ${selectedBet.street?.numbers?.join("-")}`;
-    if ("corner" in selectedBet)
-      return `Corner: ${selectedBet.corner?.numbers?.join("-")}`;
-    if ("fiveNumber" in selectedBet) return "Five Number (0-00-1-2-3)";
-    if ("line" in selectedBet)
-      return `Line: ${selectedBet.line?.numbers?.join("-")}`;
-    if ("column" in selectedBet) return `Column ${selectedBet.column?.column}`;
-    if ("dozen" in selectedBet) return `Dozen ${selectedBet.dozen?.dozen}`;
-    if ("red" in selectedBet) return "Red";
-    if ("black" in selectedBet) return "Black";
-    if ("even" in selectedBet) return "Even";
-    if ("odd" in selectedBet) return "Odd";
-    if ("high" in selectedBet) return "High (19-36)";
-    if ("low" in selectedBet) return "Low (1-18)";
-  }
+    return formatBet(selectedBet);
+  }, [selectedBet]);
 
   const placeBet = useCallback(
     (betAmount: string) => {
@@ -126,276 +326,276 @@ export function RouletteTable() {
   );
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen  px-8 py-4">
-      <div className="bg-green-700 p-6 rounded-lg shadow-2xl border-4 border-yellow-600">
-        <div className="flex gap-1">
-          {/* Zero and Double Zero Section */}
-          <div className="flex flex-col gap-1 mr-1 relative">
-            <button
-              onClick={() => setSelectedBet({ straightUp: { number: 0 } })}
-              className={`${getNumberColor(
-                0
-              )} text-white font-bold w-12 h-28 rounded border-2 border-yellow-600 hover:opacity-80 transition`}
-            >
-              0
-            </button>
-            <button
-              onClick={() => setSelectedBet({ straightUp: { number: 37 } })}
-              className={`${getNumberColor(
-                37
-              )} text-white font-bold w-12 h-28 rounded border-2 border-yellow-600 hover:opacity-80 transition`}
-            >
-              00
-            </button>
-            {/* Five Number Bet - intersection of 0, 00, 1, 2, 3 */}
-            <button
-              onClick={() => setSelectedBet({ fiveNumber: {} })}
-              className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-red-400 rounded-full border border-yellow-600 hover:w-4 hover:h-4 transition-all z-10"
-              data-tooltip="Five Number (0-00-1-2-3)"
+    <div className="flex flex-col items-end">
+      <div className="bg-(--roulette-table-green) p-8 border-3 border-amber-500 rounded-md w-fit">
+        <div className="flex justify-center items-center">
+          {/* Straight: 0, 00 */}
+          <div className="flex flex-col relative">
+            {["0", "00"].map((value) => (
+              <ZeroButton
+                key={value}
+                value={value}
+                isSelected={
+                  selectedBet?.straightUp?.number === (value === "00" ? 37 : 0)
+                }
+                onClick={() => {
+                  const number = value === "00" ? 37 : 0;
+
+                  setSelectedBet(
+                    selectedBet?.straightUp?.number === number
+                      ? null
+                      : { straightUp: { number } }
+                  );
+                }}
+              />
+            ))}
+            {/* Five Number */}
+            <InsideBetButton
+              label="5#"
+              tooltipText="Five Number"
+              isSelected={"fiveNumber" in (selectedBet ?? {})}
+              onClick={() => {
+                setSelectedBet(
+                  selectedBet?.fiveNumber ? null : { fiveNumber: {} }
+                );
+              }}
+              className="bottom-0 right-0 translate-x-1/2 translate-y-1/2"
             />
           </div>
+          {/* Straight: 1 - 36 */}
+          <div className="grid grid-cols-12 grid-rows-3 w-fit relative">
+            {tableNumbers.flat().map((num, i) => {
+              const row = Math.floor(i / 12);
+              // every number except the last one of a row and numbers in the last row have corner bets
+              const hasCorner = i % 12 !== 11 && row < 2;
+              // every number in the first row has street bets
+              const hasStreet = i < 12;
+              // every number in the last row except the last one has line bets
+              const hasLine = i % 12 !== 11 && row === 2;
+              // every number except the last one of a row has split bets
+              const hasSplit = i % 12 !== 11;
 
-          {/* Main Number Grid */}
-          <div className="flex flex-col gap-1 relative">
-            {tableNumbers.map((row, rowIdx) => {
-              // console.log(row, rowIdx);
               return (
-                <div key={rowIdx} className="flex gap-1 relative">
-                  {row.map((num, colIdx) => (
-                    <div key={num} className="relative">
-                      {/* Straight Up Bet */}
-                      <button
-                        onClick={() =>
-                          setSelectedBet({ straightUp: { number: num } })
-                        }
-                        className={`${getNumberColor(
-                          num
-                        )} text-white font-bold w-12 h-12 rounded border-2 border-yellow-600 hover:opacity-80 transition shownone`}
-                      >
-                        {num}
-                      </button>
-
-                      {/* Split Bets - Horizontal (right edge) */}
-                      {colIdx < row.length - 1 && (
-                        <button
-                          onClick={() =>
-                            setSelectedBet({
-                              split: {
-                                numbers: [num, row[colIdx + 1]] as [
-                                  number,
-                                  number
-                                ],
-                              },
-                            })
-                          }
-                          className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 w-2 h-8 bg-green-400 rounded-full hover:w-3 transition-all z-1 opacity-70 hover:opacity-100"
-                          data-tooltip={`Split: ${num}-${row[colIdx + 1]}`}
-                        />
-                      )}
-
-                      {/* Split Bets - Vertical (bottom edge) */}
-                      {rowIdx < tableNumbers.length - 1 && (
-                        <button
-                          onClick={() =>
-                            setSelectedBet({
-                              split: {
-                                numbers: [
-                                  num,
-                                  tableNumbers[rowIdx + 1][colIdx],
-                                ] as [number, number],
-                              },
-                            })
-                          }
-                          className="absolute left-1/2 -bottom-0.5 transform -translate-x-1/2 w-8 h-2 bg-blue-300 rounded-full hover:h-3 transition-all z-1 opacity-70 hover:opacity-100"
-                          data-tooltip={`Split: ${num}-${
-                            tableNumbers[rowIdx + 1][colIdx]
-                          }`}
-                        />
-                      )}
-
-                      {/* Corner Bets */}
-                      {rowIdx < tableNumbers.length - 1 &&
-                        colIdx < row.length - 1 && (
-                          <button
-                            onClick={() =>
-                              setSelectedBet({
-                                corner: {
-                                  numbers: [
-                                    num,
-                                    row[colIdx + 1],
-                                    tableNumbers[rowIdx + 1][colIdx],
-                                    tableNumbers[rowIdx + 1][colIdx + 1],
-                                  ] as [number, number, number, number],
-                                },
-                              })
-                            }
-                            className="absolute -right-0.5 -bottom-0.5 w-3 h-3 bg-white rounded-full hover:w-4 hover:h-4 transition-all z-1 opacity-70 hover:opacity-100"
-                            data-tooltip={`Corner: ${num}-${row[colIdx + 1]}-${
-                              tableNumbers[rowIdx + 1][colIdx]
-                            }-${tableNumbers[rowIdx + 1][colIdx + 1]}`}
-                          />
-                        )}
-                    </div>
-                  ))}
-
-                  {/* Street Bets - Left edge of each row */}
-                  <button
-                    onClick={() =>
-                      setSelectedBet({
-                        street: {
-                          numbers: [row[0], row[1], row[2]] as [
-                            number,
-                            number,
-                            number
-                          ],
-                        },
-                      })
-                    }
-                    className="absolute -left-1 top-1/2 transform -translate-y-1/2 w-2 h-10 bg-yellow-200 rounded-full hover:w-3 transition-all z-1 opacity-70 hover:opacity-100"
-                    data-tooltip={`Street: ${row[0]}-${row[1]}-${row[2]}`}
+                <div className="relative" key={num}>
+                  <NumberButton
+                    number={num}
+                    isSelected={selectedBet?.straightUp?.number === num}
+                    onClick={() => {
+                      setSelectedBet(
+                        selectedBet?.straightUp?.number === num
+                          ? null
+                          : { straightUp: { number: num } }
+                      );
+                    }}
                   />
-
-                  {/* 2 to 1 Column Bets */}
-                  <button
-                    onClick={() =>
-                      setSelectedBet({ column: { column: rowIdx + 1 } })
-                    }
-                    className="bg-green-600 text-yellow-400 font-bold w-16 h-12 rounded border-2 border-yellow-600 hover:bg-green-500 transition text-sm"
-                  >
-                    2 to 1
-                  </button>
+                  {/* Corner */}
+                  {hasCorner && (
+                    <InsideBetButton
+                      label="C"
+                      tooltipText={`Corner: ${num - 1}, ${num}, ${num + 2}, ${
+                        num + 3
+                      }`}
+                      isSelected={
+                        selectedBet?.corner &&
+                        selectedBet.corner.numbers.every((n) =>
+                          [num - 1, num, num + 2, num + 3].includes(n)
+                        )
+                      }
+                      onClick={() => {
+                        const cornerNumbers = [num - 1, num, num + 2, num + 3];
+                        setSelectedBet(
+                          selectedBet?.corner &&
+                            selectedBet.corner.numbers.every((n) =>
+                              cornerNumbers.includes(n)
+                            )
+                            ? null
+                            : { corner: { numbers: cornerNumbers } }
+                        );
+                      }}
+                      className="bottom-0 right-0 translate-x-1/2 translate-y-1/2"
+                    />
+                  )}
+                  {/* Street */}
+                  {hasStreet && (
+                    <InsideBetButton
+                      label="St"
+                      tooltipText={`Street: ${num - 2}, ${num - 1}, ${num}`}
+                      isSelected={
+                        selectedBet?.street &&
+                        selectedBet.street.numbers.every((n) =>
+                          [num - 2, num - 1, num].includes(n)
+                        )
+                      }
+                      onClick={() => {
+                        const streetNumbers = [num - 2, num - 1, num];
+                        setSelectedBet(
+                          selectedBet?.street &&
+                            selectedBet.street.numbers.every((n) =>
+                              streetNumbers.includes(n)
+                            )
+                            ? null
+                            : { street: { numbers: streetNumbers } }
+                        );
+                      }}
+                      className="right-1/2 top-0 translate-x-1/2 -translate-y-1/2"
+                    />
+                  )}
+                  {/* Line */}
+                  {hasLine && (
+                    <InsideBetButton
+                      label="L"
+                      tooltipText={`Line: ${num}, ${num + 1}, ${num + 2}, ${
+                        num + 3
+                      }, ${num + 4}, ${num + 5}`}
+                      isSelected={
+                        selectedBet?.line &&
+                        selectedBet.line.numbers.every((n) =>
+                          [
+                            num,
+                            num + 1,
+                            num + 2,
+                            num + 3,
+                            num + 4,
+                            num + 5,
+                          ].includes(n)
+                        )
+                      }
+                      onClick={() => {
+                        const lineNumbers = [
+                          num,
+                          num + 1,
+                          num + 2,
+                          num + 3,
+                          num + 4,
+                          num + 5,
+                        ];
+                        setSelectedBet(
+                          selectedBet?.line &&
+                            selectedBet.line.numbers.every((n) =>
+                              lineNumbers.includes(n)
+                            )
+                            ? null
+                            : { line: { numbers: lineNumbers } }
+                        );
+                      }}
+                      className="bottom-0 right-0 translate-x-1/2 translate-y-1/2"
+                    />
+                  )}
+                  {hasSplit && (
+                    <InsideBetButton
+                      label="Sp"
+                      tooltipText={`Split: ${num}, ${num + 3}`}
+                      isSelected={
+                        selectedBet?.split &&
+                        selectedBet.split.numbers.every((n) =>
+                          [num, num + 3].includes(n)
+                        )
+                      }
+                      onClick={() => {
+                        const splitNumbers = [num, num + 3];
+                        setSelectedBet(
+                          selectedBet?.split &&
+                            selectedBet.split.numbers.every((n) =>
+                              splitNumbers.includes(n)
+                            )
+                            ? null
+                            : { split: { numbers: splitNumbers } }
+                        );
+                      }}
+                      className="right-0 top-1/2 translate-x-1/2 -translate-y-1/2"
+                    />
+                  )}
                 </div>
               );
             })}
-
-            {/* Line Bets - 6 buttons for 6 pairs of columns */}
-            {Array.from({ length: 6 }, (_, buttonIdx) => {
-              const col1 = buttonIdx * 2; // 0, 2, 4, 6, 8, 10
-              const col2 = col1 + 1; // 1, 3, 5, 7, 9, 11
+          </div>
+          {/* Column */}
+          <div className="flex flex-col">
+            {[1, 2, 3].map((col) => (
+              <ColumnButton
+                key={col}
+                number={col}
+                isSelected={selectedBet?.column?.column === col}
+                onClick={() => {
+                  setSelectedBet(
+                    selectedBet?.column?.column === col
+                      ? null
+                      : { column: { column: col } }
+                  );
+                }}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="flex flex-col">
+          {/* Dozen */}
+          <div className="flex justify-center">
+            {[1, 2, 3].map((dozen) => (
+              <DozenButton
+                key={dozen}
+                value={dozen}
+                isSelected={selectedBet?.dozen?.dozen === dozen}
+                onClick={() => {
+                  setSelectedBet(
+                    selectedBet?.dozen?.dozen === dozen
+                      ? null
+                      : { dozen: { dozen } }
+                  );
+                }}
+              />
+            ))}
+          </div>
+          {/* High, Even, Red, Black, Odd, Low */}
+          <div className="flex justify-center">
+            {["low", "even", "red", "black", "odd", "high"].map((value) => {
+              const selected =
+                selectedBet !== null &&
+                (("red" in selectedBet && value === "red") ||
+                  ("black" in selectedBet && value === "black") ||
+                  ("even" in selectedBet && value === "even") ||
+                  ("odd" in selectedBet && value === "odd") ||
+                  ("low" in selectedBet && value === "low") ||
+                  ("high" in selectedBet && value === "high"));
 
               return (
-                <button
-                  key={`line-${buttonIdx}`}
-                  onClick={() =>
-                    setSelectedBet({
-                      line: {
-                        numbers: [
-                          tableNumbers[0][col1], // Row 0, First column of pair
-                          tableNumbers[0][col2], // Row 0, Second column of pair
-                          tableNumbers[1][col1], // Row 1, First column of pair
-                          tableNumbers[1][col2], // Row 1, Second column of pair
-                          tableNumbers[2][col1], // Row 2, First column of pair
-                          tableNumbers[2][col2], // Row 2, Second column of pair
-                        ] as [number, number, number, number, number, number],
-                      },
-                    })
-                  }
-                  className="absolute w-3 h-3 bg-purple-900 rounded-full hover:w-4 hover:h-4 transition-all z-1 opacity-70 hover:opacity-100"
-                  style={{
-                    left: `${((col1 + col2 + 1) / 2 / 12) * 91}%`, // Position between the two columns
-                    top: `-5%`,
-                    transform: "translate(-50%, -50%)",
+                <BottomButton
+                  key={value}
+                  value={value}
+                  isSelected={selected}
+                  onClick={() => {
+                    let betType: BetType;
+                    switch (value) {
+                      case "red":
+                        betType = { red: {} };
+                        break;
+                      case "black":
+                        betType = { black: {} };
+                        break;
+                      case "even":
+                        betType = { even: {} };
+                        break;
+                      case "odd":
+                        betType = { odd: {} };
+                        break;
+                      case "low":
+                        betType = { low: {} };
+                        break;
+                      case "high":
+                        betType = { high: {} };
+                        break;
+                      default:
+                        throw new Error("Invalid bet type.");
+                    }
+
+                    setSelectedBet(selected ? null : betType);
                   }}
-                  data-tooltip={`Line: ${tableNumbers[0][col1]}-${tableNumbers[0][col2]}-${tableNumbers[1][col1]}-${tableNumbers[1][col2]}-${tableNumbers[2][col1]}-${tableNumbers[2][col2]}`}
                 />
               );
             })}
           </div>
         </div>
-
-        {/* Dozen Bets */}
-        <div className="flex gap-1 mt-1">
-          <div className="w-12"></div>
-          <div className="flex gap-1 flex-1">
-            <button
-              onClick={() => setSelectedBet({ dozen: { dozen: 1 } })}
-              className="bg-green-600 text-yellow-400 font-bold flex-1 h-12 rounded border-2 border-yellow-600 hover:bg-green-500 transition text-sm"
-            >
-              1st 12
-            </button>
-            <button
-              onClick={() => setSelectedBet({ dozen: { dozen: 2 } })}
-              className="bg-green-600 text-yellow-400 font-bold flex-1 h-12 rounded border-2 border-yellow-600 hover:bg-green-500 transition text-sm"
-            >
-              2nd 12
-            </button>
-            <button
-              onClick={() => setSelectedBet({ dozen: { dozen: 3 } })}
-              className="bg-green-600 text-yellow-400 font-bold flex-1 h-12 rounded border-2 border-yellow-600 hover:bg-green-500 transition text-sm"
-            >
-              3rd 12
-            </button>
-          </div>
-          <div className="w-16"></div>
-        </div>
-
-        {/* Outside Bets */}
-        <div className="flex gap-1 mt-1">
-          <div className="w-12"></div>
-          <div className="grid grid-cols-6 gap-1 flex-1">
-            <button
-              onClick={() => setSelectedBet({ low: {} })}
-              className="bg-green-600 text-yellow-400 font-bold h-12 rounded border-2 border-yellow-600 hover:bg-green-500 transition text-sm"
-            >
-              1-18
-            </button>
-            <button
-              onClick={() => setSelectedBet({ even: {} })}
-              className="bg-green-600 text-yellow-400 font-bold h-12 rounded border-2 border-yellow-600 hover:bg-green-500 transition text-sm"
-            >
-              EVEN
-            </button>
-            <button
-              onClick={() => setSelectedBet({ red: {} })}
-              className="bg-red-600 text-white font-bold h-12 rounded border-2 border-yellow-600 hover:opacity-80 transition flex items-center justify-center"
-            >
-              <div className="w-6 h-6 bg-red-600 rounded-full border-2 border-white"></div>
-            </button>
-            <button
-              onClick={() => setSelectedBet({ black: {} })}
-              className="bg-black text-white font-bold h-12 rounded border-2 border-yellow-600 hover:opacity-80 transition flex items-center justify-center"
-            >
-              <div className="w-6 h-6 bg-black rounded-full border-2 border-white"></div>
-            </button>
-            <button
-              onClick={() => setSelectedBet({ odd: {} })}
-              className="bg-green-600 text-yellow-400 font-bold h-12 rounded border-2 border-yellow-600 hover:bg-green-500 transition text-sm"
-            >
-              ODD
-            </button>
-            <button
-              onClick={() => setSelectedBet({ high: {} })}
-              className="bg-green-600 text-yellow-400 font-bold h-12 rounded border-2 border-yellow-600 hover:bg-green-500 transition text-sm"
-            >
-              19-36
-            </button>
-          </div>
-          <div className="w-16"></div>
-        </div>
       </div>
-
-      {selectedBet && (
-        <>
-          <div className="mt-6 flex gap-4">
-            <button
-              onClick={() => setSelectedBet(null)}
-              className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition"
-            >
-              Clear Bets
-            </button>
-          </div>
-          <div className="mt-4 bg-green-800 p-4 rounded-lg border-2 border-yellow-600 max-w-2xl">
-            <div className="font-semibold text-yellow-400 mb-2">
-              Selected Bet:
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <div className="bg-green-900 text-white px-3 py-1 rounded border border-yellow-600 text-sm flex items-center gap-2">
-                <span>{formatBet()}</span>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+      <p>{formattedBet}</p>
     </div>
   );
 }
