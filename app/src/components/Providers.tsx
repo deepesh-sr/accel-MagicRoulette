@@ -8,6 +8,8 @@ import { ProgramProvider } from "@/providers/ProgramProvider";
 import { SolanaProvider } from "@/providers/SolanaProvider";
 import { TableProvider } from "@/providers/TableProvider";
 import { BalanceProvider } from "@/providers/BalanceProvider";
+import { TimeProvider } from "@/providers/TimeProvider";
+import { TransactionProvider } from "@/providers/TransactionProvider";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -18,15 +20,19 @@ export function Providers({ children }: { children: ReactNode }) {
         fetcher: wrappedFetch,
       }}
     >
-      <SettingsProvider>
-        <SolanaProvider>
-          <ProgramProvider>
-            <BalanceProvider>
-              <TableProvider>{children}</TableProvider>
-            </BalanceProvider>
-          </ProgramProvider>
-        </SolanaProvider>
-      </SettingsProvider>
+      <TimeProvider>
+        <SettingsProvider>
+          <SolanaProvider>
+            <ProgramProvider>
+              <TransactionProvider>
+                <BalanceProvider>
+                  <TableProvider>{children}</TableProvider>
+                </BalanceProvider>
+              </TransactionProvider>
+            </ProgramProvider>
+          </SolanaProvider>
+        </SettingsProvider>
+      </TimeProvider>
     </SWRConfig>
   );
 }

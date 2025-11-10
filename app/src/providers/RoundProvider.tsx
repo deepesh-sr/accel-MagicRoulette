@@ -18,7 +18,7 @@ import { useTable } from "./TableProvider";
 import { useConnection } from "@jup-ag/wallet-adapter";
 import { BN } from "@coral-xyz/anchor";
 import { timestampToMilli } from "@/lib/utils";
-import { useTime } from "@/hooks/useTime";
+import { useTime } from "@/providers/TimeProvider";
 
 interface RoundContextType {
   roundData: ParsedRound | undefined;
@@ -56,7 +56,7 @@ export function RoundProvider({
   const { magicRouletteClient } = useProgram();
   const { connection } = useConnection();
   const [lastRoundOutcome, setLastRoundOutcome] = useState<number | null>(null);
-  const time = useTime();
+  const { time } = useTime();
 
   const roundEndsInSecs = useMemo(() => {
     return tableData
