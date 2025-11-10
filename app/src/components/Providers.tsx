@@ -7,6 +7,7 @@ import { SettingsProvider } from "@/providers/SettingsProvider";
 import { ProgramProvider } from "@/providers/ProgramProvider";
 import { SolanaProvider } from "@/providers/SolanaProvider";
 import { TableProvider } from "@/providers/TableProvider";
+import { BalanceProvider } from "@/providers/BalanceProvider";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -20,7 +21,9 @@ export function Providers({ children }: { children: ReactNode }) {
       <SettingsProvider>
         <SolanaProvider>
           <ProgramProvider>
-            <TableProvider>{children}</TableProvider>
+            <BalanceProvider>
+              <TableProvider>{children}</TableProvider>
+            </BalanceProvider>
           </ProgramProvider>
         </SolanaProvider>
       </SettingsProvider>
