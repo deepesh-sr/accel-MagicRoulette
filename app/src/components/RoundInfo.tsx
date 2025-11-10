@@ -15,7 +15,7 @@ import { useSettings } from "@/providers/SettingsProvider";
 import { sendTx } from "@/lib/api";
 import { toast } from "sonner";
 import { InfoText } from "./InfoText";
-import { useTransaction } from "@/hooks/useTransaction";
+import { useTransaction } from "@/providers/TransactionProvider";
 
 export function RoundInfo() {
   const { magicRouletteClient } = useProgram();
