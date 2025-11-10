@@ -239,6 +239,7 @@ function InsideBetButton({
             className
           )}
           onClick={onClick}
+          tabIndex={0}
         >
           {label}
         </Badge>
