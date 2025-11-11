@@ -17,6 +17,7 @@ import Image from "next/image";
 import { Input } from "./ui/input";
 import { cn, parseLamportsToSol } from "@/lib/utils";
 import { WalletMinimal } from "lucide-react";
+import { BigRoundedButton } from "./BigRoundedButton";
 
 const increments = [1, 0.1, 0.01];
 
@@ -170,8 +171,7 @@ export function PlaceBetSection() {
           {formattedBet === "" ? "-" : formattedBet}
         </p>
       </div>
-      <Button
-        className="cursor-pointer rounded-full"
+      <BigRoundedButton
         onClick={() => placeBet(betAmount.toString())}
         disabled={
           isInsufficientBalance ||
@@ -187,7 +187,7 @@ export function PlaceBetSection() {
           : selectedBet === null
           ? "Bet Not Selected"
           : "Place Bet"}
-      </Button>
+      </BigRoundedButton>
     </section>
   );
 }
