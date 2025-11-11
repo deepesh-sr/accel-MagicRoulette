@@ -9,6 +9,8 @@ import {
   useState,
 } from "react";
 
+const balanceBuffer = 10000; // lamports for covering transaction fees
+
 interface BalanceContextType {
   balance: number | null;
 }
@@ -29,8 +31,13 @@ export function BalanceProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!publicKey) return;
 
+    (async () => {
+      const balance = await connection.getBalance(publicKey);
+      setBalance(balance - balanceBuffer);
+    })();
+
     const id = connection.onAccountChange(publicKey, (acc) => {
-      setBalance(acc.lamports);
+      setBalance(acc.lamports - balanceBuffer);
     });
 
     return () => {
