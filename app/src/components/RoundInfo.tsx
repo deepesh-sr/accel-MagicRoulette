@@ -36,7 +36,7 @@ export function RoundInfo() {
   const { publicKey, signTransaction } = useUnifiedWallet();
   const { connection } = useConnection();
   const { tableData, tableLoading } = useTable();
-  const { lastRoundOutcome, hasRoundEnded, roundEndsInSecs } = useRound();
+  const { lastRoundOutcome, isRoundOver, roundEndsInSecs } = useRound();
   const { roundData, roundLoading } = useRound();
   const { betsData, betsLoading } = useBets();
   const {
@@ -169,9 +169,9 @@ export function RoundInfo() {
       </div>
       <BigRoundedButton
         onClick={spinRoulette}
-        disabled={!tableData || isSendingTransaction || !hasRoundEnded}
+        disabled={!tableData || isSendingTransaction || !isRoundOver}
       >
-        {hasRoundEnded
+        {isRoundOver
           ? "Spin Roulette"
           : `Round ends in ${formatCountdown(
               milliToTimestamp(roundEndsInSecs)
