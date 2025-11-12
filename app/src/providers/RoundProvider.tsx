@@ -1,6 +1,6 @@
 "use client";
 
-import { ParsedRound, parseRound, Round } from "@/types/accounts";
+import { parseBN, ParsedRound, parseRound, Round } from "@/types/accounts";
 import { wrappedFetch } from "@/lib/api";
 import {
   createContext,
@@ -104,6 +104,16 @@ export function RoundProvider({
               Number(prev.nextRoundTs) + Number(prev.roundPeriodTs)
             ).toString(),
           };
+        });
+
+        const newRoundNumber = round.roundNumber.addn(1);
+
+        await roundMutate({
+          isSpun: false,
+          outcome: null,
+          poolAmount: "0",
+          publicKey: magicRouletteClient.getRoundPda(newRoundNumber).toBase58(),
+          roundNumber: parseBN(newRoundNumber),
         });
       }
     },
