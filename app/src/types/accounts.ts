@@ -51,7 +51,7 @@ function parsePublicKey(field: PublicKey | null): string {
     : field.toBase58();
 }
 
-function parseBN(field: BN): bigIntString {
+export function parseBN(field: BN): bigIntString {
   return field.toString();
 }
 
