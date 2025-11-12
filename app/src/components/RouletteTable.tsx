@@ -66,7 +66,7 @@ function NumberButton({
     <BaseButton
       className={`${cn(
         "text-white relative",
-        isRed ? "bg-red-600" : "bg-black"
+        isRed ? "bg-(--roulette-button-red)" : "bg-black"
       )}`}
       tooltipText={`Straight: ${number}`}
       isSelected={isSelected}
@@ -154,7 +154,7 @@ function BottomButton({
       className={cn(
         " text-white h-12 w-24",
         value === "red"
-          ? "bg-red-500"
+          ? "bg-(--roulette-button-red)"
           : value === "black"
           ? "bg-black"
           : "bg-green-600"
@@ -191,9 +191,9 @@ function InsideBetButton({
         <Badge
           variant={"outline"}
           className={cn(
-            "cursor-pointer text-xs font-semibold transition-opacity z-2 absolute rounded-full tabular-nums size-5 p-1",
+            "cursor-pointer text-xs font-semibold transition-opacity z-2 absolute rounded-full tabular-nums size-5 p-1 border border-white",
             isSelected
-              ? "bg-yellow-600 hover:bg-yellow-600 text-white"
+              ? "bg-yellow-500 hover:bg-yellow-500 text-white"
               : "bg-white hover:bg-primary/90 text-black",
             className
           )}
@@ -212,10 +212,10 @@ export function RouletteTable() {
   const { selectedBet, setSelectedBet } = useBets();
 
   return (
-    <div className="bg-(--roulette-table-green) p-8 border-3 border-amber-500 rounded-md flex flex-col items-center shrink-0">
+    <div className="bg-(--roulette-table-green) p-8 border-3 border-(--roulette-table-gold) rounded-md flex flex-col items-center shrink-0">
       <div className="flex justify-center items-center">
         {/* Straight: 00, 0 */}
-        <div className="flex flex-col relative border-l-2 border-y-2">
+        <div className="flex flex-col relative border-l-2 border-y-2 border-white">
           {["00", "0"].map((value) => (
             <ZeroButton
               key={value}
@@ -248,7 +248,7 @@ export function RouletteTable() {
           />
         </div>
         {/* Straight: 1 - 36 */}
-        <div className="grid grid-cols-12 grid-rows-3 relative border-y-2 shrink-0">
+        <div className="grid grid-cols-12 grid-rows-3 relative border-y-2 border-white shrink-0">
           {tableNumbers.flat().map((num, i) => {
             const row = Math.floor(i / 12);
             // every number except the last one of a row and numbers in the last row have corner bets
@@ -395,7 +395,7 @@ export function RouletteTable() {
           })}
         </div>
         {/* Column */}
-        <div className="flex flex-col border-r-2 border-y-2">
+        <div className="flex flex-col border-r-2 border-y-2 border-white">
           {[1, 2, 3].map((col) => (
             <ColumnButton
               key={col}
@@ -414,7 +414,7 @@ export function RouletteTable() {
       </div>
       <div className="flex flex-col">
         {/* Dozen */}
-        <div className="flex justify-center border-x-2 w-full">
+        <div className="flex justify-center border-x-2 border-white w-full">
           {[1, 2, 3].map((dozen) => (
             <DozenButton
               key={dozen}
@@ -431,7 +431,7 @@ export function RouletteTable() {
           ))}
         </div>
         {/* High, Even, Red, Black, Odd, Low */}
-        <div className="flex justify-center border-x-2 border-b-2">
+        <div className="flex justify-center border-x-2 border-b-2 border-white">
           {["low", "even", "red", "black", "odd", "high"].map((value) => {
             const selected =
               selectedBet !== null &&
