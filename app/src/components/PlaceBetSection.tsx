@@ -19,6 +19,7 @@ import { cn, parseLamportsToSol } from "@/lib/utils";
 import { WalletMinimal } from "lucide-react";
 import { BigRoundedButton } from "./BigRoundedButton";
 import { InfoDiv } from "./InfoDiv";
+import { useRound } from "@/providers/RoundProvider";
 
 const increments = [1, 0.1, 0.01];
 
@@ -28,6 +29,7 @@ export function PlaceBetSection() {
   const { publicKey, signTransaction } = useUnifiedWallet();
   const { priorityFee } = useSettings();
   const { magicRouletteClient } = useProgram();
+  const { isRoundOver } = useRound();
   const { selectedBet, formattedBet } = useBets();
   const {
     isSendingTransaction,
@@ -174,18 +176,21 @@ export function PlaceBetSection() {
       <BigRoundedButton
         onClick={() => placeBet(betAmount.toString())}
         disabled={
-          isInsufficientBalance ||
-          isAmountTooSmall ||
+          isRoundOver ||
           selectedBet === null ||
+          isAmountTooSmall ||
+          isInsufficientBalance ||
           isSendingTransaction
         }
       >
-        {isInsufficientBalance
-          ? "Insufficient Balance"
-          : isAmountTooSmall
-          ? "Amount Too Small"
+        {isRoundOver
+          ? "Round Over"
           : selectedBet === null
           ? "Bet Not Selected"
+          : isAmountTooSmall
+          ? "Amount Too Small"
+          : isInsufficientBalance
+          ? "Insufficient Balance"
           : "Place Bet"}
       </BigRoundedButton>
     </section>

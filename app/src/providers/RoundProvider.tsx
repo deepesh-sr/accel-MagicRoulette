@@ -25,7 +25,7 @@ interface RoundContextType {
   roundLoading: boolean;
   roundMutate: KeyedMutator<ParsedRound>;
   lastRoundOutcome: number | null;
-  hasRoundEnded: boolean;
+  isRoundOver: boolean;
   roundEndsInSecs: number;
 }
 
@@ -64,7 +64,7 @@ export function RoundProvider({
       : Infinity;
   }, [tableData, time]);
 
-  const hasRoundEnded = roundEndsInSecs <= 0;
+  const isRoundOver = roundEndsInSecs <= 0;
 
   const handleRoundChange = useCallback(
     async (acc: AccountInfo<Buffer<ArrayBufferLike>>) => {
@@ -148,7 +148,7 @@ export function RoundProvider({
         roundLoading,
         roundMutate,
         lastRoundOutcome,
-        hasRoundEnded,
+        isRoundOver,
         roundEndsInSecs,
       }}
     >
