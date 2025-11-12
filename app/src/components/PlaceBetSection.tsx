@@ -33,7 +33,7 @@ export function PlaceBetSection() {
   const { magicRouletteClient } = useProgram();
   const { tableData } = useTable();
   const { roundData, roundMutate, isRoundOver } = useRound();
-  const { betsMutate, selectedBet, formattedBet } = useBets();
+  const { betsData, betsMutate, selectedBet, formattedBet } = useBets();
   const {
     isSendingTransaction,
     setIsSendingTransaction,
@@ -47,6 +47,14 @@ export function PlaceBetSection() {
     isNaN(betAmount) ||
     betAmount <= 0 ||
     Number(tableData?.minimumBetAmount) > betAmount * LAMPORTS_PER_SOL;
+  const placedBet = Boolean(
+    betsData?.find((bet) => {
+      return (
+        bet.round === roundData?.publicKey &&
+        bet.player === publicKey?.toBase58()
+      );
+    })
+  );
 
   const placeBet = useCallback(
     (betAmount: string) => {
@@ -241,6 +249,7 @@ export function PlaceBetSection() {
         onClick={() => placeBet(betAmount.toString())}
         disabled={
           isRoundOver ||
+          placedBet ||
           selectedBet === null ||
           isBelowMinimumBet ||
           isInsufficientBalance ||
@@ -249,6 +258,8 @@ export function PlaceBetSection() {
       >
         {isRoundOver
           ? "Round Over"
+          : placedBet
+          ? "Bet Already Placed"
           : selectedBet === null
           ? "Bet Not Selected"
           : isBelowMinimumBet
