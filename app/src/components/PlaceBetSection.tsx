@@ -15,12 +15,13 @@ import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { Skeleton } from "./ui/skeleton";
 import Image from "next/image";
 import { Input } from "./ui/input";
-import { cn, parseSolToLamports } from "@/lib/utils";
+import { cn, parseLamportsToSol, parseSolToLamports } from "@/lib/utils";
 import { WalletMinimal } from "lucide-react";
 import { BigRoundedButton } from "./BigRoundedButton";
 import { InfoDiv } from "./InfoDiv";
 import { useRound } from "@/providers/RoundProvider";
 import { BN } from "@coral-xyz/anchor";
+import { useTable } from "@/providers/TableProvider";
 
 const increments = [1, 0.1, 0.01];
 
@@ -30,6 +31,7 @@ export function PlaceBetSection() {
   const { publicKey, signTransaction } = useUnifiedWallet();
   const { priorityFee } = useSettings();
   const { magicRouletteClient } = useProgram();
+  const { tableData } = useTable();
   const { roundData, roundMutate, isRoundOver } = useRound();
   const { betsMutate, selectedBet, formattedBet } = useBets();
   const {
@@ -41,7 +43,10 @@ export function PlaceBetSection() {
 
   const isInsufficientBalance =
     balance === null || balance < betAmount * LAMPORTS_PER_SOL;
-  const isAmountTooSmall = isNaN(betAmount) || betAmount <= 0;
+  const isBelowMinimumBet =
+    isNaN(betAmount) ||
+    betAmount <= 0 ||
+    Number(tableData?.minimumBetAmount) > betAmount * LAMPORTS_PER_SOL;
 
   const placeBet = useCallback(
     (betAmount: string) => {
@@ -201,8 +206,16 @@ export function PlaceBetSection() {
             placeholder="1"
             type="number"
             inputMode="decimal"
-            step={0.1}
-            min={0}
+            step={
+              tableData
+                ? Number(parseLamportsToSol(tableData?.minimumBetAmount))
+                : 0.000001
+            }
+            min={
+              tableData
+                ? Number(parseLamportsToSol(tableData?.minimumBetAmount))
+                : 0
+            }
             className="no-slider text-end font-semibold text-2xl! placeholder:text-secondary/75 selection:bg-primary/20 selection:text-primary text-primary placeholder:font-semibold placeholder:text-2xl border-none shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0 px-1 bg-transparent!"
             value={betAmount}
             onChange={(e) => {
@@ -227,7 +240,7 @@ export function PlaceBetSection() {
         disabled={
           isRoundOver ||
           selectedBet === null ||
-          isAmountTooSmall ||
+          isBelowMinimumBet ||
           isInsufficientBalance ||
           isSendingTransaction
         }
@@ -236,8 +249,12 @@ export function PlaceBetSection() {
           ? "Round Over"
           : selectedBet === null
           ? "Bet Not Selected"
-          : isAmountTooSmall
-          ? "Amount Too Small"
+          : isBelowMinimumBet
+          ? tableData
+            ? `Minimum Bet: ${parseLamportsToSol(
+                tableData?.minimumBetAmount
+              )} SOL`
+            : "Amount Too Low"
           : isInsufficientBalance
           ? "Insufficient Balance"
           : "Place Bet"}
