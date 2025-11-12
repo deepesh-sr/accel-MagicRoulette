@@ -4,8 +4,7 @@ use anchor_lang::{
 };
 
 use crate::{
-    error::MagicRouletteError, utils::close, Bet, Round, Table, BET_SEED, ID, ROUND_SEED,
-    TABLE_SEED, VAULT_SEED,
+    error::MagicRouletteError, Bet, Round, Table, BET_SEED, ID, ROUND_SEED, TABLE_SEED, VAULT_SEED,
 };
 
 #[derive(Accounts)]
