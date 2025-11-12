@@ -20,6 +20,7 @@ import { WalletMinimal } from "lucide-react";
 import { BigRoundedButton } from "./BigRoundedButton";
 import { InfoDiv } from "./InfoDiv";
 import { useRound } from "@/providers/RoundProvider";
+import { BN } from "@coral-xyz/anchor";
 
 const increments = [1, 0.1, 0.01];
 
@@ -29,7 +30,7 @@ export function PlaceBetSection() {
   const { publicKey, signTransaction } = useUnifiedWallet();
   const { priorityFee } = useSettings();
   const { magicRouletteClient } = useProgram();
-  const { roundData, isRoundOver } = useRound();
+  const { roundData, roundMutate, isRoundOver } = useRound();
   const { betsMutate, selectedBet, formattedBet } = useBets();
   const {
     isSendingTransaction,
@@ -103,6 +104,19 @@ export function PlaceBetSection() {
               return prev;
             });
 
+            await roundMutate((prev) => {
+              if (!prev) {
+                throw new Error("Round should not be null.");
+              }
+
+              return {
+                ...prev,
+                poolAmount: new BN(prev.poolAmount)
+                  .add(new BN(betAmount))
+                  .toString(),
+              };
+            });
+
             return showTransactionToast("Bet place!", signature);
           },
           error: (err) => {
@@ -124,6 +138,7 @@ export function PlaceBetSection() {
       setIsSendingTransaction,
       showTransactionToast,
       betsMutate,
+      roundMutate,
     ]
   );
 
