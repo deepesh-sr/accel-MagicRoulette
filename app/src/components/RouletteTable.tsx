@@ -21,13 +21,13 @@ const redNumbers = [
 function BaseButton({
   className,
   tooltipText,
-  selected = false,
+  isSelected = false,
   onClick,
   children,
 }: {
   className?: string;
   tooltipText: string;
-  selected?: boolean;
+  isSelected?: boolean;
   onClick: () => void;
   children: ReactNode;
 }) {
@@ -39,7 +39,7 @@ function BaseButton({
           className={cn(
             "cursor-pointer rounded-none border border-white font-bold size-12",
             className,
-            selected ? "bg-yellow-600 hover:bg-yellow-600 text-white" : ""
+            isSelected ? "bg-yellow-600 hover:bg-yellow-600 text-white" : ""
           )}
           onClick={onClick}
         >
@@ -69,7 +69,7 @@ function NumberButton({
         isRed ? "bg-red-600" : "bg-black"
       )}`}
       tooltipText={`Straight: ${number}`}
-      selected={isSelected}
+      isSelected={isSelected}
       onClick={onClick}
     >
       {number}
@@ -90,7 +90,7 @@ function ColumnButton({
     <BaseButton
       className={cn("bg-green-600 text-white")}
       tooltipText={`Column: ${number}`}
-      selected={isSelected}
+      isSelected={isSelected}
       onClick={onClick}
     >
       2 to 1
@@ -111,7 +111,7 @@ function ZeroButton({
     <BaseButton
       className={cn("text-white bg-green-600 w-12 h-18")}
       tooltipText={`Straight: ${value}`}
-      selected={isSelected}
+      isSelected={isSelected}
       onClick={onClick}
     >
       {value}
@@ -132,7 +132,7 @@ function DozenButton({
     <BaseButton
       className={"bg-green-600 text-white h-12 w-48"}
       tooltipText={`Dozen: ${value}`}
-      selected={isSelected}
+      isSelected={isSelected}
       onClick={onClick}
     >
       {value === 1 ? "1st" : value === 2 ? "2nd" : "3rd"} 12
@@ -160,7 +160,7 @@ function BottomButton({
           : "bg-green-600"
       )}
       tooltipText={capitalizeFirstLetter(value)}
-      selected={isSelected}
+      isSelected={isSelected}
       onClick={onClick}
     >
       {value === "low"
