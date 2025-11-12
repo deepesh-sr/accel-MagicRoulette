@@ -23,7 +23,11 @@ function LoadingSkeleton() {
 }
 
 function RoundInfoSpan({ text }: { text: string }) {
-  return <span className="text-2xl font-semibold text-primary">{text}</span>;
+  return (
+    <span className="text-2xl font-semibold text-primary text-center">
+      {text}
+    </span>
+  );
 }
 
 function RoundInfoP({ text }: { text: string }) {

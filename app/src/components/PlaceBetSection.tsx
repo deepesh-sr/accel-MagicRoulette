@@ -170,7 +170,7 @@ export function PlaceBetSection() {
               <Button
                 key={inc}
                 variant="secondary"
-                className="cursor-pointer rounded-xs h-6 w-12 py-2 px-4 text-xs font-semibold bg-primary"
+                className="cursor-pointer rounded-xs h-6 w-12 py-2 px-4 text-xs font-semibold"
                 onClick={() =>
                   setBetAmount((prev) => {
                     return Number(
@@ -211,7 +211,12 @@ export function PlaceBetSection() {
       </InfoDiv>
       <div className="flex justify-between">
         <p className="font-semibold text-secondary">Selected Bet</p>
-        <p className="font-semibold text-primary">
+        <p
+          className={cn(
+            "font-semibold",
+            formattedBet === "" ? "text-primary" : "text-yellow-500"
+          )}
+        >
           {formattedBet === "" ? "-" : formattedBet}
         </p>
       </div>

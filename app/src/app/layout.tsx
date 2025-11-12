@@ -32,7 +32,9 @@ export default function RootLayout({
       >
         <Providers>
           <Header />
-          <main className="flex flex-1 flex-col items-center">{children}</main>
+          <main className="flex flex-1 flex-col items-center px-8 py-4">
+            {children}
+          </main>
         </Providers>
         <Toaster richColors closeButton />
       </body>
