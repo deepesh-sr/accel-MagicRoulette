@@ -162,7 +162,12 @@ export function PlaceBetSection() {
   return (
     <section className="flex flex-col gap-2">
       <InfoDiv>
-        <div className="flex items-center justify-between gap-4 w-full">
+        <div
+          className={cn(
+            "flex items-center gap-4 w-full",
+            publicKey ? "justify-between" : "justify-end"
+          )}
+        >
           {balance ? (
             <Button
               asChild
@@ -180,7 +185,7 @@ export function PlaceBetSection() {
               </div>
             </Button>
           ) : (
-            <Skeleton className="h-5 max-w-30 w-full" />
+            publicKey && <Skeleton className="h-5 max-w-40 w-full" />
           )}
           <div className="flex items-center gap-2 px-1">
             {increments.map((inc) => (
