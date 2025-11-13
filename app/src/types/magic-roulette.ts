@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/magic_roulette.json`.
  */
 export type MagicRoulette = {
-  address: "RoU12A5xEwWtqqJHRsVwwHVqpRuZCXaffJEjvb4LFDa";
+  address: "RoUnLrec2JvYFMf6ZWnK2wgK8xKaUjwi1GEUPf6fFiF";
   metadata: {
     name: "magicRoulette";
     version: "0.1.0";
@@ -498,6 +498,11 @@ export type MagicRoulette = {
       code: 6016;
       name: "invalidBetType";
       msg: "Bet type is illegal";
+    },
+    {
+      code: 6017;
+      name: "winningsAlreadyClaimed";
+      msg: "Winnings have already been claimed for this bet";
     }
   ];
   types: [
@@ -526,19 +531,19 @@ export type MagicRoulette = {
             type: "u8";
           },
           {
+            name: "isClaimed";
+            docs: [
+              "Boolean that indicates if the prize for a winning bet has been claimed."
+            ];
+            type: "bool";
+          },
+          {
             name: "betType";
             type: {
               defined: {
                 name: "betType";
               };
             };
-          },
-          {
-            name: "isClaimed";
-            docs: [
-              "Boolean that indicates if the prize for a winning bet has been claimed."
-            ];
-            type: "bool";
           }
         ];
       };

@@ -1,17 +1,17 @@
 [toolchain]
-package_manager = "yarn"
-solana_version = "2.1.0"
 anchor_version = "0.31.1"
+solana_version = "2.1.0"
+package_manager = "yarn"
 
 [features]
 resolution = true
 skip-lint = false
 
-[programs.localnet]
-magic_roulette = "B5iruL7jqDXHtWrpBYu9FJVaq5tcgvv7sGLqte5iYRbg"
-
 [programs.devnet]
-magic_roulette = "2XxU8pq1HfvB5QAb7snmMPqNsQf8jzQevvJ41JUMzba9"
+magic_roulette = "RoUnLrec2JvYFMf6ZWnK2wgK8xKaUjwi1GEUPf6fFiF"
+
+[programs.localnet]
+magic_roulette = "RoUnLrec2JvYFMf6ZWnK2wgK8xKaUjwi1GEUPf6fFiF"
 
 [registry]
 url = "https://api.apr.dev"

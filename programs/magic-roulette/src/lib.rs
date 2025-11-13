@@ -10,7 +10,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("2XxU8pq1HfvB5QAb7snmMPqNsQf8jzQevvJ41JUMzba9");
+declare_id!("RoUnLrec2JvYFMf6ZWnK2wgK8xKaUjwi1GEUPf6fFiF");
 
 #[program]
 pub mod magic_roulette {
