@@ -41,16 +41,27 @@ export default function Page() {
     );
   }
 
-  return (
+  // only load all bets when wallet is connected
+  return publicKey ? (
+    <BetsProvider player={publicKey.toBase58()}>
+      {tableData && (
+        <RoundProvider
+          pda={magicRouletteClient
+            .getRoundPda(new BN(Number(tableData.currentRoundNumber)))
+            .toBase58()}
+        >
+          <Main />
+        </RoundProvider>
+      )}
+    </BetsProvider>
+  ) : (
     tableData && (
       <RoundProvider
         pda={magicRouletteClient
           .getRoundPda(new BN(Number(tableData.currentRoundNumber)))
           .toBase58()}
       >
-        <BetsProvider player={publicKey?.toBase58()}>
-          <Main />
-        </BetsProvider>
+        <Main />
       </RoundProvider>
     )
   );

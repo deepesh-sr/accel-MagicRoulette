@@ -7,6 +7,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { capitalizeFirstLetter, cn } from "@/lib/utils";
 import { Badge } from "./ui/badge";
 import { useBets } from "@/providers/BetsProvider";
+import { PublicKey } from "@solana/web3.js";
+import { toast } from "sonner";
+import { useUnifiedWallet } from "@jup-ag/wallet-adapter";
 
 const tableNumbers = [
   [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36],
@@ -22,12 +25,14 @@ function BaseButton({
   className,
   tooltipText,
   isSelected = false,
+  publicKey,
   onClick,
   children,
 }: {
   className?: string;
   tooltipText: string;
   isSelected?: boolean;
+  publicKey?: PublicKey | null;
   onClick: () => void;
   children: ReactNode;
 }) {
@@ -41,7 +46,13 @@ function BaseButton({
             className,
             isSelected ? "bg-yellow-600 hover:bg-yellow-600 text-white" : ""
           )}
-          onClick={onClick}
+          onClick={() => {
+            if (!publicKey) {
+              return toast.error("Wallet not connected.");
+            }
+
+            onClick();
+          }}
         >
           {children}
         </Button>
@@ -54,10 +65,12 @@ function BaseButton({
 function NumberButton({
   number,
   isSelected = false,
+  publicKey,
   onClick,
 }: {
   number: number;
   isSelected?: boolean;
+  publicKey?: PublicKey | null;
   onClick: () => void;
 }) {
   const isRed = redNumbers.includes(number);
@@ -70,6 +83,7 @@ function NumberButton({
       )}`}
       tooltipText={`Straight: ${number}`}
       isSelected={isSelected}
+      publicKey={publicKey}
       onClick={onClick}
     >
       {number}
@@ -80,11 +94,13 @@ function NumberButton({
 function ColumnButton({
   number,
   isSelected = false,
+  publicKey,
   className = "",
   onClick,
 }: {
   number: number;
   isSelected?: boolean;
+  publicKey?: PublicKey | null;
   className?: string;
   onClick: () => void;
 }) {
@@ -93,6 +109,7 @@ function ColumnButton({
       className={cn("bg-green-600 text-white", className)}
       tooltipText={`Column: ${number}`}
       isSelected={isSelected}
+      publicKey={publicKey}
       onClick={onClick}
     >
       2 to 1
@@ -104,11 +121,13 @@ function ZeroButton({
   value,
   isSelected = false,
   className = "",
+  publicKey,
   onClick,
 }: {
   value: string;
   isSelected?: boolean;
   className?: string;
+  publicKey?: PublicKey | null;
   onClick: () => void;
 }) {
   return (
@@ -116,6 +135,7 @@ function ZeroButton({
       className={cn("text-white bg-green-600 w-12 h-18", className)}
       tooltipText={`Straight: ${value}`}
       isSelected={isSelected}
+      publicKey={publicKey}
       onClick={onClick}
     >
       {value}
@@ -126,10 +146,12 @@ function ZeroButton({
 function DozenButton({
   value,
   isSelected = false,
+  publicKey,
   onClick,
 }: {
   value: number;
   isSelected?: boolean;
+  publicKey?: PublicKey | null;
   onClick: () => void;
 }) {
   return (
@@ -137,6 +159,7 @@ function DozenButton({
       className={"bg-green-600 text-white h-12 w-48"}
       tooltipText={`Dozen: ${value}`}
       isSelected={isSelected}
+      publicKey={publicKey}
       onClick={onClick}
     >
       {value === 1 ? "1st" : value === 2 ? "2nd" : "3rd"} 12
@@ -148,11 +171,13 @@ function BottomButton({
   value,
   isSelected = false,
   className = "",
+  publicKey,
   onClick,
 }: {
   value: string;
   isSelected?: boolean;
   className?: string;
+  publicKey?: PublicKey | null;
   onClick: () => void;
 }) {
   return (
@@ -168,6 +193,7 @@ function BottomButton({
       )}
       tooltipText={capitalizeFirstLetter(value)}
       isSelected={isSelected}
+      publicKey={publicKey}
       onClick={onClick}
     >
       {value === "low"
@@ -183,12 +209,14 @@ function InsideBetButton({
   label,
   tooltipText,
   isSelected = false,
+  publicKey,
   onClick,
   className,
 }: {
   label: string;
   tooltipText: string;
   isSelected?: boolean;
+  publicKey?: PublicKey | null;
   onClick: () => void;
   className?: string;
 }) {
@@ -204,7 +232,13 @@ function InsideBetButton({
               : "bg-white hover:bg-primary/90 text-black",
             className
           )}
-          onClick={onClick}
+          onClick={() => {
+            if (!publicKey) {
+              return toast.error("Wallet not connected.");
+            }
+
+            onClick();
+          }}
           tabIndex={0}
         >
           {label}
@@ -216,6 +250,7 @@ function InsideBetButton({
 }
 
 export function RouletteTable() {
+  const { publicKey } = useUnifiedWallet();
   const { selectedBet, setSelectedBet } = useBets();
 
   return (
@@ -230,6 +265,7 @@ export function RouletteTable() {
               isSelected={
                 selectedBet?.straightUp?.number === (value === "00" ? 37 : 0)
               }
+              publicKey={publicKey}
               className={value === "00" ? "rounded-tl-sm" : "rounded-bl-sm"}
               onClick={() => {
                 const number = value === "00" ? 37 : 0;
@@ -247,6 +283,7 @@ export function RouletteTable() {
             label="5#"
             tooltipText="Five Number"
             isSelected={"fiveNumber" in (selectedBet ?? {})}
+            publicKey={publicKey}
             onClick={() => {
               setSelectedBet(
                 selectedBet?.fiveNumber ? null : { fiveNumber: {} }
@@ -273,6 +310,7 @@ export function RouletteTable() {
                 <NumberButton
                   number={num}
                   isSelected={selectedBet?.straightUp?.number === num}
+                  publicKey={publicKey}
                   onClick={() => {
                     setSelectedBet(
                       selectedBet?.straightUp?.number === num
@@ -294,6 +332,7 @@ export function RouletteTable() {
                         [num - 1, num, num + 2, num + 3].includes(n)
                       )
                     }
+                    publicKey={publicKey}
                     onClick={() => {
                       const cornerNumbers = [num - 1, num, num + 2, num + 3];
                       setSelectedBet(
@@ -319,6 +358,7 @@ export function RouletteTable() {
                         [num - 2, num - 1, num].includes(n)
                       )
                     }
+                    publicKey={publicKey}
                     onClick={() => {
                       const streetNumbers = [num - 2, num - 1, num];
                       setSelectedBet(
@@ -353,6 +393,7 @@ export function RouletteTable() {
                         ].includes(n)
                       )
                     }
+                    publicKey={publicKey}
                     onClick={() => {
                       const lineNumbers = [
                         num,
@@ -384,6 +425,7 @@ export function RouletteTable() {
                         [num, num + 3].includes(n)
                       )
                     }
+                    publicKey={publicKey}
                     onClick={() => {
                       const splitNumbers = [num, num + 3];
                       setSelectedBet(
@@ -409,6 +451,7 @@ export function RouletteTable() {
               key={col}
               number={col}
               isSelected={selectedBet?.column?.column === col}
+              publicKey={publicKey}
               className={
                 col === 1 ? "rounded-tr-sm" : col === 3 ? "rounded-br-sm" : ""
               }
@@ -431,6 +474,7 @@ export function RouletteTable() {
               key={dozen}
               value={dozen}
               isSelected={selectedBet?.dozen?.dozen === dozen}
+              publicKey={publicKey}
               onClick={() => {
                 setSelectedBet(
                   selectedBet?.dozen?.dozen === dozen
@@ -445,7 +489,7 @@ export function RouletteTable() {
         <div className="flex justify-center border-x-2 border-b-2 border-white rounded-b-md w-full">
           {["low", "even", "red", "black", "odd", "high"].map((value) => {
             const selected =
-              selectedBet !== null &&
+              !!selectedBet &&
               (("red" in selectedBet && value === "red") ||
                 ("black" in selectedBet && value === "black") ||
                 ("even" in selectedBet && value === "even") ||
@@ -458,6 +502,7 @@ export function RouletteTable() {
                 key={value}
                 value={value}
                 isSelected={selected}
+                publicKey={publicKey}
                 className={
                   value === "low"
                     ? "rounded-bl-sm"
