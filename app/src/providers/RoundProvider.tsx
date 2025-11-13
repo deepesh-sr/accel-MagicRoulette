@@ -15,10 +15,13 @@ import useSWR, { KeyedMutator } from "swr";
 import { AccountInfo, PublicKey } from "@solana/web3.js";
 import { useProgram } from "./ProgramProvider";
 import { useTable } from "./TableProvider";
-import { useConnection } from "@jup-ag/wallet-adapter";
+import { useConnection, useUnifiedWallet } from "@jup-ag/wallet-adapter";
 import { BN } from "@coral-xyz/anchor";
-import { timestampToMilli } from "@/lib/utils";
+import { parseLamportsToSol, timestampToMilli } from "@/lib/utils";
 import { useTime } from "@/providers/TimeProvider";
+import { useBets } from "./BetsProvider";
+import { isWinner, payoutMultiplier } from "@/lib/betType";
+import { toast } from "sonner";
 
 interface RoundContextType {
   roundData: ParsedRound | undefined;
@@ -53,8 +56,10 @@ export function RoundProvider({
       .round as ParsedRound;
   });
   const { tableData, tableMutate } = useTable();
+  const { betsData } = useBets();
   const { magicRouletteClient } = useProgram();
   const { connection } = useConnection();
+  const { publicKey } = useUnifiedWallet();
   const [lastRoundOutcome, setLastRoundOutcome] = useState<number | null>(null);
   const { time } = useTime();
 
@@ -89,6 +94,29 @@ export function RoundProvider({
         // round outcome has been set
         setLastRoundOutcome(round.outcome);
 
+        if (publicKey && roundData) {
+          const roundPlayerBet = betsData?.find((bet) => {
+            return bet.round === roundData.publicKey;
+          });
+
+          if (roundPlayerBet) {
+            const hasWon = isWinner(roundPlayerBet.betType, round.outcome);
+
+            if (hasWon) {
+              const amountWonInLamports = new BN(roundPlayerBet.amount).muln(
+                payoutMultiplier(roundPlayerBet.betType)
+              );
+              const amountWonInSol = parseLamportsToSol(
+                amountWonInLamports.toString()
+              );
+
+              toast.success(
+                `You won ${amountWonInSol} SOL from round #${round.roundNumber}!`
+              );
+            }
+          }
+        }
+
         await tableMutate((prev) => {
           if (!prev) {
             throw new Error("Table should not be null.`");
@@ -117,7 +145,14 @@ export function RoundProvider({
         });
       }
     },
-    [magicRouletteClient, tableMutate, roundMutate]
+    [
+      magicRouletteClient,
+      publicKey,
+      betsData,
+      roundData,
+      tableMutate,
+      roundMutate,
+    ]
   );
 
   // initial fetch of last round outcome
