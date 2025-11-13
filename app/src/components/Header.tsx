@@ -1,7 +1,7 @@
 "use client";
 
 import { UnifiedWalletButton } from "@jup-ag/wallet-adapter";
-import { LifeBuoy } from "lucide-react";
+import { Github, LifeBuoy } from "lucide-react";
 import Link from "next/link";
 import { SettingsDropdown } from "./SettingsDropdown";
 import {
@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import { Button } from "./ui/button";
 
 function WrappedTabsTrigger({
   value,
@@ -204,6 +205,20 @@ export function Header() {
         </div>
       </div>
       <div className="flex items-center gap-4">
+        <Button
+          variant={"link"}
+          size={"icon"}
+          className="cursor-pointer size-8"
+          asChild
+        >
+          <Link
+            href={"https://github.com/Turbin3/accel-MagicRoulette"}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Github className="text-foreground" />
+          </Link>
+        </Button>
         <SettingsDropdown />
         <UnifiedWalletButton />
       </div>
