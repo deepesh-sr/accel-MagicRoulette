@@ -147,6 +147,30 @@ function Main() {
       : new BN(0);
   }, [claimableBets]);
 
+  const allTimeWinnings = useMemo(() => {
+    if (!betsData || !roundsData) return new BN(0);
+
+    return betsData.reduce((total, bet) => {
+      const matchingRound = roundsData.find(
+        (round) => round.publicKey === bet.round
+      );
+
+      if (!matchingRound) {
+        return total;
+      }
+
+      if (isWinner(bet.betType, matchingRound.outcome)) {
+        // multiplier +1 to factor basis cost when calculating payout
+        const payout = new BN(bet.amount).muln(
+          payoutMultiplier(bet.betType) + 1
+        );
+        return total.add(payout);
+      } else {
+        return total.sub(new BN(bet.amount));
+      }
+    }, new BN(0));
+  }, [roundsData, betsData]);
+
   const data = useMemo<BetHistoryRecord[]>(() => {
     if (!roundsData || !betsData) return [];
 
@@ -365,7 +389,29 @@ function Main() {
     <section className="w-full flex flex-col gap-4 justify-start">
       <div className="flex items-center gap-6 justify-between">
         <h2 className="text-2xl font-semibold">Bet History</h2>
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center">
+          {publicKey && (
+            <p className="text-sm">
+              All Time Winnings:{" "}
+              <span
+                className={cn(
+                  "font-semibold",
+                  allTimeWinnings.gt(new BN(0))
+                    ? "text-green-500"
+                    : allTimeWinnings.eq(new BN(0))
+                    ? "text-foreground"
+                    : "text-red-400"
+                )}
+              >
+                {allTimeWinnings.gt(new BN(0))
+                  ? "+"
+                  : allTimeWinnings.eq(new BN(0))
+                  ? ""
+                  : "-"}
+                {parseLamportsToSol(allTimeWinnings.toString())} SOL
+              </span>
+            </p>
+          )}
           <Select
             value={filter}
             onValueChange={(value) => setFilter(value as FilterValue)}
