@@ -1,5 +1,5 @@
 {
-  "address": "RoU12A5xEwWtqqJHRsVwwHVqpRuZCXaffJEjvb4LFDa",
+  "address": "RoUnLrec2JvYFMf6ZWnK2wgK8xKaUjwi1GEUPf6fFiF",
   "metadata": {
     "name": "magic_roulette",
     "version": "0.1.0",
@@ -9,7 +9,16 @@
   "instructions": [
     {
       "name": "advance_round",
-      "discriminator": [230, 88, 119, 80, 54, 4, 212, 250],
+      "discriminator": [
+        230,
+        88,
+        119,
+        80,
+        54,
+        4,
+        212,
+        250
+      ],
       "accounts": [
         {
           "name": "vrf_program_identity",
@@ -23,7 +32,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [116, 97, 98, 108, 101]
+                "value": [
+                  116,
+                  97,
+                  98,
+                  108,
+                  101
+                ]
               }
             ]
           }
@@ -35,7 +50,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [114, 111, 117, 110, 100]
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
               },
               {
                 "kind": "account",
@@ -52,7 +73,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [114, 111, 117, 110, 100]
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
               },
               {
                 "kind": "account",
@@ -71,14 +98,26 @@
         {
           "name": "randomness",
           "type": {
-            "array": ["u8", 32]
+            "array": [
+              "u8",
+              32
+            ]
           }
         }
       ]
     },
     {
       "name": "claim_winnings",
-      "discriminator": [161, 215, 24, 59, 14, 236, 242, 221],
+      "discriminator": [
+        161,
+        215,
+        24,
+        59,
+        14,
+        236,
+        242,
+        221
+      ],
       "accounts": [
         {
           "name": "player",
@@ -92,7 +131,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [118, 97, 117, 108, 116]
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
               }
             ]
           }
@@ -103,7 +148,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [116, 97, 98, 108, 101]
+                "value": [
+                  116,
+                  97,
+                  98,
+                  108,
+                  101
+                ]
               }
             ]
           }
@@ -117,7 +168,16 @@
     },
     {
       "name": "initialize_table",
-      "discriminator": [223, 143, 246, 102, 122, 200, 108, 147],
+      "discriminator": [
+        223,
+        143,
+        246,
+        102,
+        122,
+        200,
+        108,
+        147
+      ],
       "accounts": [
         {
           "name": "admin",
@@ -131,7 +191,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [118, 97, 117, 108, 116]
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
               }
             ]
           }
@@ -143,7 +209,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [116, 97, 98, 108, 101]
+                "value": [
+                  116,
+                  97,
+                  98,
+                  108,
+                  101
+                ]
               }
             ]
           }
@@ -155,11 +227,26 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [114, 111, 117, 110, 100]
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
               },
               {
                 "kind": "const",
-                "value": [1, 0, 0, 0, 0, 0, 0, 0]
+                "value": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
               }
             ]
           }
@@ -182,7 +269,16 @@
     },
     {
       "name": "place_bet",
-      "discriminator": [222, 62, 67, 220, 63, 166, 126, 33],
+      "discriminator": [
+        222,
+        62,
+        67,
+        220,
+        63,
+        166,
+        126,
+        33
+      ],
       "accounts": [
         {
           "name": "player",
@@ -196,7 +292,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [118, 97, 117, 108, 116]
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
               }
             ]
           }
@@ -207,7 +309,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [116, 97, 98, 108, 101]
+                "value": [
+                  116,
+                  97,
+                  98,
+                  108,
+                  101
+                ]
               }
             ]
           }
@@ -219,7 +327,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [114, 111, 117, 110, 100]
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
               },
               {
                 "kind": "account",
@@ -236,7 +350,11 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [98, 101, 116]
+                "value": [
+                  98,
+                  101,
+                  116
+                ]
               },
               {
                 "kind": "account",
@@ -271,7 +389,16 @@
     },
     {
       "name": "spin_roulette",
-      "discriminator": [6, 130, 248, 38, 161, 155, 17, 30],
+      "discriminator": [
+        6,
+        130,
+        248,
+        38,
+        161,
+        155,
+        17,
+        30
+      ],
       "accounts": [
         {
           "name": "payer",
@@ -284,7 +411,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [116, 97, 98, 108, 101]
+                "value": [
+                  116,
+                  97,
+                  98,
+                  108,
+                  101
+                ]
               }
             ]
           }
@@ -296,7 +429,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [114, 111, 117, 110, 100]
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
               },
               {
                 "kind": "account",
@@ -313,7 +452,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [114, 111, 117, 110, 100]
+                "value": [
+                  114,
+                  111,
+                  117,
+                  110,
+                  100
+                ]
               },
               {
                 "kind": "account",
@@ -334,7 +479,16 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [105, 100, 101, 110, 116, 105, 116, 121]
+                "value": [
+                  105,
+                  100,
+                  101,
+                  110,
+                  116,
+                  105,
+                  116,
+                  121
+                ]
               }
             ]
           }
@@ -356,13 +510,24 @@
     },
     {
       "name": "update_table",
-      "discriminator": [224, 23, 10, 48, 181, 73, 121, 187],
+      "discriminator": [
+        224,
+        23,
+        10,
+        48,
+        181,
+        73,
+        121,
+        187
+      ],
       "accounts": [
         {
           "name": "admin",
           "writable": true,
           "signer": true,
-          "relations": ["table"]
+          "relations": [
+            "table"
+          ]
         },
         {
           "name": "table",
@@ -371,7 +536,13 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [116, 97, 98, 108, 101]
+                "value": [
+                  116,
+                  97,
+                  98,
+                  108,
+                  101
+                ]
               }
             ]
           }
@@ -396,15 +567,42 @@
   "accounts": [
     {
       "name": "Bet",
-      "discriminator": [147, 23, 35, 59, 15, 75, 155, 32]
+      "discriminator": [
+        147,
+        23,
+        35,
+        59,
+        15,
+        75,
+        155,
+        32
+      ]
     },
     {
       "name": "Round",
-      "discriminator": [87, 127, 165, 51, 73, 78, 116, 174]
+      "discriminator": [
+        87,
+        127,
+        165,
+        51,
+        73,
+        78,
+        116,
+        174
+      ]
     },
     {
       "name": "Table",
-      "discriminator": [34, 100, 138, 97, 236, 129, 230, 112]
+      "discriminator": [
+        34,
+        100,
+        138,
+        97,
+        236,
+        129,
+        230,
+        112
+      ]
     }
   ],
   "errors": [
@@ -492,6 +690,11 @@
       "code": 6016,
       "name": "InvalidBetType",
       "msg": "Bet type is illegal"
+    },
+    {
+      "code": 6017,
+      "name": "WinningsAlreadyClaimed",
+      "msg": "Winnings have already been claimed for this bet"
     }
   ],
   "types": [
@@ -502,22 +705,35 @@
         "fields": [
           {
             "name": "player",
-            "docs": ["Player who placed the bet."],
+            "docs": [
+              "Player who placed the bet."
+            ],
             "type": "pubkey"
           },
           {
             "name": "round",
-            "docs": ["Round in which the bet was placed."],
+            "docs": [
+              "Round in which the bet was placed."
+            ],
             "type": "pubkey"
           },
           {
             "name": "amount",
-            "docs": ["Amount of lamports bet."],
+            "docs": [
+              "Amount of lamports bet."
+            ],
             "type": "u64"
           },
           {
             "name": "bump",
             "type": "u8"
+          },
+          {
+            "name": "is_claimed",
+            "docs": [
+              "Boolean that indicates if the prize for a winning bet has been claimed."
+            ],
+            "type": "bool"
           },
           {
             "name": "bet_type",
@@ -526,13 +742,6 @@
                 "name": "BetType"
               }
             }
-          },
-          {
-            "name": "is_claimed",
-            "docs": [
-              "Boolean that indicates if the prize for a winning bet has been claimed."
-            ],
-            "type": "bool"
           }
         ]
       }
@@ -557,7 +766,10 @@
               {
                 "name": "numbers",
                 "type": {
-                  "array": ["u8", 2]
+                  "array": [
+                    "u8",
+                    2
+                  ]
                 }
               }
             ]
@@ -568,7 +780,10 @@
               {
                 "name": "numbers",
                 "type": {
-                  "array": ["u8", 3]
+                  "array": [
+                    "u8",
+                    3
+                  ]
                 }
               }
             ]
@@ -579,7 +794,10 @@
               {
                 "name": "numbers",
                 "type": {
-                  "array": ["u8", 4]
+                  "array": [
+                    "u8",
+                    4
+                  ]
                 }
               }
             ]
@@ -593,7 +811,10 @@
               {
                 "name": "numbers",
                 "type": {
-                  "array": ["u8", 6]
+                  "array": [
+                    "u8",
+                    6
+                  ]
                 }
               }
             ]
@@ -653,7 +874,9 @@
           },
           {
             "name": "pool_amount",
-            "docs": ["Lamports pooled from all bets in this round."],
+            "docs": [
+              "Lamports pooled from all bets in this round."
+            ],
             "type": "u64"
           },
           {
@@ -669,7 +892,9 @@
           },
           {
             "name": "outcome",
-            "docs": ["The number that won (0-36, with 37 representing 00)"],
+            "docs": [
+              "The number that won (0-36, with 37 representing 00)"
+            ],
             "type": {
               "option": "u8"
             }
@@ -684,27 +909,37 @@
         "fields": [
           {
             "name": "admin",
-            "docs": ["Authority of the table."],
+            "docs": [
+              "Authority of the table."
+            ],
             "type": "pubkey"
           },
           {
             "name": "minimum_bet_amount",
-            "docs": ["Minimum bet amount in lamports."],
+            "docs": [
+              "Minimum bet amount in lamports."
+            ],
             "type": "u64"
           },
           {
             "name": "current_round_number",
-            "docs": ["Number of the current round."],
+            "docs": [
+              "Number of the current round."
+            ],
             "type": "u64"
           },
           {
             "name": "next_round_ts",
-            "docs": ["Timestamp when round can be advanced."],
+            "docs": [
+              "Timestamp when round can be advanced."
+            ],
             "type": "i64"
           },
           {
             "name": "round_period_ts",
-            "docs": ["Timestamp for how long each round lasts."],
+            "docs": [
+              "Timestamp for how long each round lasts."
+            ],
             "type": "u64"
           },
           {
