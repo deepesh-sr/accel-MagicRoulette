@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
       if (isClaimed) {
         filters.push({
           memcmp: {
-            offset: DISCRIMINATOR_SIZE + 32 + 32 + 8 + 1 + 1 + 7,
+            offset: DISCRIMINATOR_SIZE + 32 + 32 + 8 + 1,
             bytes: boolToByte(isClaimed.toLowerCase() === "true"),
             encoding: "base64",
           },
