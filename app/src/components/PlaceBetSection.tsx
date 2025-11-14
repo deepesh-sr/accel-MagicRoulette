@@ -146,7 +146,7 @@ export function PlaceBetSection() {
 
   return (
     <section className="flex flex-col gap-2">
-      <InfoDiv>
+      <InfoDiv className="bg-primary/10">
         <div
           className={cn(
             "flex items-center gap-4 w-full",
