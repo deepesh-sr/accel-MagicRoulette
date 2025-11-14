@@ -22,6 +22,7 @@ import { useTime } from "@/providers/TimeProvider";
 import { useBets } from "./BetsProvider";
 import { isWinner, payoutMultiplier } from "@/lib/betType";
 import { toast } from "sonner";
+import { useRounds } from "./RoundsProvider";
 
 interface RoundContextType {
   roundData: ParsedRound | undefined;
@@ -57,6 +58,7 @@ export function RoundProvider({
   });
   const { tableData, tableMutate } = useTable();
   const { betsData } = useBets();
+  const { roundsMutate } = useRounds();
   const { magicRouletteClient } = useProgram();
   const { connection } = useConnection();
   const { publicKey } = useUnifiedWallet();
@@ -142,6 +144,31 @@ export function RoundProvider({
           publicKey: newRoundPda.toBase58(),
           roundNumber: parseBN(newRoundNumber),
         });
+
+        await roundsMutate((prev) => {
+          if (!prev) return prev;
+
+          const rounds = prev.map((r) => {
+            if (r.roundNumber === parseBN(round.roundNumber)) {
+              return {
+                ...r,
+                outcome: round.outcome,
+              };
+            }
+
+            return r;
+          });
+
+          rounds.push({
+            publicKey: newRoundPda.toBase58(),
+            roundNumber: parseBN(newRoundNumber),
+            isSpun: false,
+            outcome: null,
+            poolAmount: "0",
+          });
+
+          return rounds;
+        });
       }
     },
     [
@@ -149,6 +176,7 @@ export function RoundProvider({
       publicKey,
       betsData,
       roundData,
+      roundsMutate,
       tableMutate,
       roundMutate,
     ]
