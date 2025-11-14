@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{error::MagicRouletteError, Table, TABLE_SEED};
+use crate::{error::MagicRouletteError, events::TableUpdated, Table, TABLE_SEED};
 
 #[derive(Accounts)]
 pub struct UpdateTable<'info> {
@@ -45,6 +45,15 @@ impl<'info> UpdateTable<'info> {
 
             self.table.admin = new_admin;
         }
+
+        let now = Clock::get()?.unix_timestamp;
+
+        emit!(TableUpdated {
+            minimum_bet_amount: minimum_bet_amount,
+            new_admin: new_admin,
+            round_period_ts: round_period_ts,
+            timestamp: now,
+        });
 
         Ok(())
     }
