@@ -3,7 +3,7 @@ use anchor_lang::{
     system_program::{transfer, Transfer},
 };
 
-use crate::{error::MagicRouletteError, Table, TABLE_SEED, VAULT_SEED};
+use crate::{error::MagicRouletteError, events::VaultWithdrawn, Table, TABLE_SEED, VAULT_SEED};
 
 #[derive(Accounts)]
 pub struct WithdrawVault<'info> {
@@ -54,6 +54,15 @@ impl<'info> WithdrawVault<'info> {
             .with_signer(&[vault_seeds]),
             amount,
         )?;
+
+        let now = Clock::get()?.unix_timestamp;
+
+        emit!(
+            (VaultWithdrawn {
+                amount,
+                timestamp: now,
+            })
+        );
 
         Ok(())
     }

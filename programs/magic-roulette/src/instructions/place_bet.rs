@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_lang::system_program::{transfer, Transfer};
 
 use crate::error::MagicRouletteError;
+use crate::events::BetPlaced;
 use crate::{Bet, BetType, Round, Table, BET_SEED, ROUND_SEED, TABLE_SEED, VAULT_SEED};
 
 #[derive(Accounts)]
@@ -87,6 +88,16 @@ impl<'info> PlaceBet<'info> {
             .pool_amount
             .checked_add(bet_amount)
             .ok_or(MagicRouletteError::MathOverflow)?;
+
+        let now = Clock::get()?.unix_timestamp;
+
+        emit!(BetPlaced {
+            bet_amount,
+            bet_type,
+            player: self.player.key(),
+            round: self.round.key(),
+            timestamp: now,
+        });
 
         Ok(())
     }

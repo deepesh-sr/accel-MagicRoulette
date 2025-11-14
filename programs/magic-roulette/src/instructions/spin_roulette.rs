@@ -6,6 +6,7 @@ use ephemeral_vrf_sdk::consts::DEFAULT_QUEUE;
 use ephemeral_vrf_sdk::instructions::{create_request_randomness_ix, RequestRandomnessParams};
 use ephemeral_vrf_sdk::types::SerializableAccountMeta;
 
+use crate::events::RouletteSpun;
 use crate::{error::MagicRouletteError, Round, Table, ROUND_SEED, TABLE_SEED};
 use crate::{instruction, ID};
 
@@ -92,6 +93,12 @@ impl<'info> SpinRoulette<'info> {
         });
 
         self.invoke_signed_vrf(&self.payer.to_account_info(), &ix)?;
+
+        emit!(RouletteSpun {
+            round: self.current_round.key(),
+            round_number: self.current_round.round_number,
+            timestamp: now,
+        });
 
         Ok(())
     }

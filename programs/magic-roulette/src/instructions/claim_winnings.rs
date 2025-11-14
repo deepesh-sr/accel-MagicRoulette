@@ -4,7 +4,8 @@ use anchor_lang::{
 };
 
 use crate::{
-    error::MagicRouletteError, Bet, Round, Table, BET_SEED, ID, ROUND_SEED, TABLE_SEED, VAULT_SEED,
+    error::MagicRouletteError, events::WinningsClaimed, Bet, Round, Table, BET_SEED, ID,
+    ROUND_SEED, TABLE_SEED, VAULT_SEED,
 };
 
 #[derive(Accounts)]
@@ -35,6 +36,8 @@ impl<'info> ClaimWinnings<'info> {
         } = ctx.accounts;
 
         let remaining_accounts = &mut ctx.remaining_accounts.iter();
+
+        let mut winnings: u64 = 0;
 
         // claim winnings for each (round, bet) pair
         while let (Some(round_account), Some(bet_account)) =
@@ -98,6 +101,9 @@ impl<'info> ClaimWinnings<'info> {
                 bet_payout,
             )?;
 
+            winnings = winnings
+                .checked_add(bet_payout)
+                .ok_or(MagicRouletteError::MathOverflow)?;
             bet.is_claimed = true;
 
             let mut data = bet_account.try_borrow_mut_data()?;
@@ -109,6 +115,14 @@ impl<'info> ClaimWinnings<'info> {
             remaining_accounts.next().is_none(),
             MagicRouletteError::InsufficientRemainingAccounts
         );
+
+        let now = Clock::get()?.unix_timestamp;
+
+        emit!(WinningsClaimed {
+            player: player.key(),
+            winnings,
+            timestamp: now,
+        });
 
         Ok(())
     }
