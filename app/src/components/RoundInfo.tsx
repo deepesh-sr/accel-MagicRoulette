@@ -12,11 +12,11 @@ import {
 } from "@/lib/utils";
 import { useRound } from "@/providers/RoundProvider";
 import { useProgram } from "@/providers/ProgramProvider";
-import { useConnection, useUnifiedWallet } from "@jup-ag/wallet-adapter";
+import { useConnection } from "@jup-ag/wallet-adapter";
 import { BN } from "@coral-xyz/anchor";
-import { buildTx } from "@/lib/client/solana";
+import { buildTx, FUNDED_KEYPAIR_PUBKEY } from "@/lib/client/solana";
 import { useSettings } from "@/providers/SettingsProvider";
-import { sendTx } from "@/lib/api";
+import { sendPermissionedTx } from "@/lib/api";
 import { toast } from "sonner";
 import { useTransaction } from "@/providers/TransactionProvider";
 import { BigRoundedButton } from "./BigRoundedButton";
@@ -42,7 +42,6 @@ function RoundInfoP({ text }: { text: string }) {
 export function RoundInfo() {
   const { magicRouletteClient } = useProgram();
   const { priorityFee, getAccountLink } = useSettings();
-  const { publicKey, signTransaction } = useUnifiedWallet();
   const { connection } = useConnection();
   const { tableData, tableLoading } = useTable();
   const {
@@ -77,10 +76,6 @@ export function RoundInfo() {
   const spinRoulette = useCallback(() => {
     toast.promise(
       async () => {
-        if (!publicKey || !signTransaction) {
-          throw new Error("Wallet not connected.");
-        }
-
         if (!tableData) {
           throw new Error("Table is not initialized.");
         }
@@ -94,29 +89,28 @@ export function RoundInfo() {
           new BN(tableData.currentRoundNumber).addn(1)
         );
 
-        let tx = await buildTx(
+        const tx = await buildTx(
           connection,
           [
             await magicRouletteClient.spinRouletteIx({
-              payer: publicKey,
+              payer: FUNDED_KEYPAIR_PUBKEY,
               currentRound: currentRoundPda,
               newRound: newRoundPda,
             }),
           ],
-          publicKey,
+          FUNDED_KEYPAIR_PUBKEY,
           [],
           priorityFee
         );
 
-        tx = await signTransaction(tx);
-        const signature = await sendTx(tx);
+        const signature = await sendPermissionedTx(tx);
 
         return {
           signature,
         };
       },
       {
-        loading: "Waiting for signature...",
+        loading: "Spinning roulette...",
         success: async ({ signature }) => {
           await roundMutate((prev) => {
             if (!prev) {
@@ -139,12 +133,10 @@ export function RoundInfo() {
       }
     );
   }, [
-    publicKey,
     tableData,
     connection,
     magicRouletteClient,
     priorityFee,
-    signTransaction,
     setIsSendingTransaction,
     showTransactionToast,
     roundMutate,
