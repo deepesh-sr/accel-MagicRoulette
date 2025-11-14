@@ -29,14 +29,14 @@ function LoadingSkeleton() {
 
 function RoundInfoSpan({ text }: { text: string }) {
   return (
-    <span className="text-2xl font-semibold text-primary text-center">
+    <span className="text-2xl font-semibold text-secondary-foreground text-center">
       {text}
     </span>
   );
 }
 
 function RoundInfoP({ text }: { text: string }) {
-  return <p className="text-sm text-accent">{text}</p>;
+  return <p className="text-sm text-secondary-foreground">{text}</p>;
 }
 
 export function RoundInfo() {
@@ -146,11 +146,7 @@ export function RoundInfo() {
     <section className="flex flex-col gap-4 grow">
       <div className="grid grid-cols-2 gap-2">
         <InfoDiv
-          className={cn(
-            tableData
-              ? "cursor-pointer hover:bg-primary/20 transition-colors"
-              : ""
-          )}
+          className={cn(tableData ? "cursor-pointer" : "")}
           onClick={() => {
             if (tableData) {
               window.open(
@@ -170,11 +166,7 @@ export function RoundInfo() {
           <RoundInfoP text="Current Round" />
         </InfoDiv>
         <InfoDiv
-          className={cn(
-            roundData
-              ? "cursor-pointer hover:bg-primary/20 transition-colors"
-              : ""
-          )}
+          className={cn(roundData ? "cursor-pointer" : "")}
           onClick={() => {
             if (roundData) {
               window.open(
@@ -197,12 +189,12 @@ export function RoundInfo() {
         </InfoDiv>
         <InfoDiv
           className={cn(
-            tableData && new BN(tableData.currentRoundNumber).gtn(0)
-              ? "cursor-pointer hover:bg-primary/20 transition-colors"
+            tableData && new BN(tableData.currentRoundNumber).gtn(1)
+              ? "cursor-pointer"
               : ""
           )}
           onClick={() => {
-            if (tableData && new BN(tableData.currentRoundNumber).gtn(0)) {
+            if (tableData && new BN(tableData.currentRoundNumber).gtn(1)) {
               const previousRoundData = magicRouletteClient.getRoundPda(
                 new BN(tableData.currentRoundNumber).subn(1)
               );
@@ -219,11 +211,7 @@ export function RoundInfo() {
           <RoundInfoP text="Last Round Outcome" />
         </InfoDiv>
         <InfoDiv
-          className={cn(
-            currentBetType
-              ? "cursor-pointer hover:bg-primary/20 transition-colors"
-              : ""
-          )}
+          className={cn(currentBetType ? "cursor-pointer" : "")}
           onClick={() => {
             if (currentBetType && betsData && roundData) {
               const bet = betsData.find((bet) => {
