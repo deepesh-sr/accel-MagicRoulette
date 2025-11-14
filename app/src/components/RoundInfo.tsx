@@ -12,16 +12,17 @@ import {
 } from "@/lib/utils";
 import { useRound } from "@/providers/RoundProvider";
 import { useProgram } from "@/providers/ProgramProvider";
-import { useConnection, useUnifiedWallet } from "@jup-ag/wallet-adapter";
+import { useConnection } from "@jup-ag/wallet-adapter";
 import { BN } from "@coral-xyz/anchor";
-import { buildTx } from "@/lib/client/solana";
+import { buildTx, FUNDED_KEYPAIR_PUBKEY } from "@/lib/client/solana";
 import { useSettings } from "@/providers/SettingsProvider";
-import { sendTx } from "@/lib/api";
+import { sendPermissionedTx } from "@/lib/api";
 import { toast } from "sonner";
 import { useTransaction } from "@/providers/TransactionProvider";
 import { BigRoundedButton } from "./BigRoundedButton";
 import { InfoDiv } from "./InfoDiv";
 import { useBets } from "@/providers/BetsProvider";
+import { useRounds } from "@/providers/RoundsProvider";
 
 function LoadingSkeleton() {
   return <Skeleton className="w-12 h-8" />;
@@ -42,7 +43,6 @@ function RoundInfoP({ text }: { text: string }) {
 export function RoundInfo() {
   const { magicRouletteClient } = useProgram();
   const { priorityFee, getAccountLink } = useSettings();
-  const { publicKey, signTransaction } = useUnifiedWallet();
   const { connection } = useConnection();
   const { tableData, tableLoading } = useTable();
   const {
@@ -54,6 +54,7 @@ export function RoundInfo() {
     roundEndsInSecs,
   } = useRound();
   const { betsData, betsLoading } = useBets();
+  const { roundsMutate } = useRounds();
   const {
     isSendingTransaction,
     setIsSendingTransaction,
@@ -77,10 +78,6 @@ export function RoundInfo() {
   const spinRoulette = useCallback(() => {
     toast.promise(
       async () => {
-        if (!publicKey || !signTransaction) {
-          throw new Error("Wallet not connected.");
-        }
-
         if (!tableData) {
           throw new Error("Table is not initialized.");
         }
@@ -94,29 +91,28 @@ export function RoundInfo() {
           new BN(tableData.currentRoundNumber).addn(1)
         );
 
-        let tx = await buildTx(
+        const tx = await buildTx(
           connection,
           [
             await magicRouletteClient.spinRouletteIx({
-              payer: publicKey,
+              payer: FUNDED_KEYPAIR_PUBKEY,
               currentRound: currentRoundPda,
               newRound: newRoundPda,
             }),
           ],
-          publicKey,
+          FUNDED_KEYPAIR_PUBKEY,
           [],
           priorityFee
         );
 
-        tx = await signTransaction(tx);
-        const signature = await sendTx(tx);
+        const signature = await sendPermissionedTx(tx);
 
         return {
           signature,
         };
       },
       {
-        loading: "Waiting for signature...",
+        loading: "Spinning roulette...",
         success: async ({ signature }) => {
           await roundMutate((prev) => {
             if (!prev) {
@@ -129,6 +125,26 @@ export function RoundInfo() {
             };
           });
 
+          await roundsMutate((prev) => {
+            if (!prev) {
+              throw new Error("Rounds should not be null.");
+            }
+
+            if (!roundData) {
+              throw new Error("Round should not be null.");
+            }
+
+            return prev.map((round) => {
+              if (round.publicKey === roundData.publicKey) {
+                return {
+                  ...round,
+                  isSpun: true,
+                };
+              }
+              return round;
+            });
+          });
+
           return showTransactionToast("Roulette spun!", signature);
         },
         error: (err) => {
@@ -139,15 +155,15 @@ export function RoundInfo() {
       }
     );
   }, [
-    publicKey,
     tableData,
+    roundData,
     connection,
     magicRouletteClient,
     priorityFee,
-    signTransaction,
     setIsSendingTransaction,
     showTransactionToast,
     roundMutate,
+    roundsMutate,
   ]);
 
   return (
@@ -205,12 +221,12 @@ export function RoundInfo() {
         </InfoDiv>
         <InfoDiv
           className={cn(
-            tableData
+            tableData && new BN(tableData.currentRoundNumber).gtn(0)
               ? "cursor-pointer hover:bg-primary/20 transition-colors"
               : ""
           )}
           onClick={() => {
-            if (tableData) {
+            if (tableData && new BN(tableData.currentRoundNumber).gtn(0)) {
               const previousRoundData = magicRouletteClient.getRoundPda(
                 new BN(tableData.currentRoundNumber).subn(1)
               );
@@ -222,7 +238,7 @@ export function RoundInfo() {
           }}
         >
           <RoundInfoSpan
-            text={lastRoundOutcome ? lastRoundOutcome.toString() : "-"}
+            text={lastRoundOutcome !== null ? lastRoundOutcome.toString() : "-"}
           />
           <RoundInfoP text="Last Round Outcome" />
         </InfoDiv>

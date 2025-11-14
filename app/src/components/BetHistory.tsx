@@ -38,7 +38,7 @@ import { toast } from "sonner";
 import { useConnection, useUnifiedWallet } from "@jup-ag/wallet-adapter";
 import { useProgram } from "@/providers/ProgramProvider";
 import { buildTx } from "@/lib/client/solana";
-import { RoundsProvider, useRounds } from "@/providers/RoundsProvider";
+import { useRounds } from "@/providers/RoundsProvider";
 import { sendTx } from "@/lib/api";
 import { isWinner, payoutMultiplier } from "@/lib/betType";
 import { cn, formatBetType, parseLamportsToSol } from "@/lib/utils";
@@ -55,6 +55,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { BN } from "@coral-xyz/anchor";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { Skeleton } from "./ui/skeleton";
+import { parseBN } from "@/types/accounts";
 
 type BetHistoryRecord = {
   publicKey: string;
@@ -137,7 +138,7 @@ function SortIcon({ column }: { column: Column<BetHistoryRecord, unknown> }) {
   );
 }
 
-function Main() {
+export function BetHistory() {
   const { connection } = useConnection();
   const { publicKey, signTransaction } = useUnifiedWallet();
   const { magicRouletteClient } = useProgram();
@@ -179,7 +180,7 @@ function Main() {
       : new BN(0);
   }, [claimableBets]);
 
-  const allTimeWinnings = useMemo(() => {
+  const netPnL = useMemo(() => {
     if (!betsData || !roundsData) return new BN(0);
 
     return betsData.reduce((total, bet) => {
@@ -192,10 +193,7 @@ function Main() {
       }
 
       if (isWinner(bet.betType, matchingRound.outcome)) {
-        // multiplier +1 to factor basis cost when calculating payout
-        const payout = new BN(bet.amount).muln(
-          payoutMultiplier(bet.betType) + 1
-        );
+        const payout = new BN(bet.amount).muln(payoutMultiplier(bet.betType));
         return total.add(payout);
       } else {
         return total.sub(new BN(bet.amount));
@@ -207,17 +205,6 @@ function Main() {
     if (!roundsData || !betsData) return [];
 
     return betsData
-      .filter((bet) => {
-        const matchingRound = roundsData.find(
-          (round) => round.publicKey === bet.round
-        );
-
-        if (!matchingRound) {
-          return false;
-        }
-
-        return matchingRound.outcome !== null;
-      })
       .map((bet) => {
         const matchingRound = roundsData.find(
           (round) => round.publicKey === bet.round
@@ -234,7 +221,7 @@ function Main() {
           hasWon,
           claimable: hasWon && !bet.isClaimed,
           payout: hasWon
-            ? new BN(bet.amount).muln(payoutMultiplier(bet.betType)).toString()
+            ? parseBN(new BN(bet.amount).muln(payoutMultiplier(bet.betType)))
             : "",
         };
       })
@@ -305,7 +292,7 @@ function Main() {
 
           return (
             <span className={cn(hasWon && "text-yellow-500 font-semibold")}>
-              {row.original.outcome}
+              {row.original.outcome ?? "-"}
             </span>
           );
         },
@@ -460,23 +447,19 @@ function Main() {
         <div className="flex gap-4 items-center">
           {publicKey && (
             <p className="text-sm">
-              All Time Winnings:{" "}
+              Net PnL:{" "}
               <span
                 className={cn(
                   "font-semibold",
-                  allTimeWinnings.gt(new BN(0))
+                  netPnL.gt(new BN(0))
                     ? "text-green-500"
-                    : allTimeWinnings.eq(new BN(0))
+                    : netPnL.eq(new BN(0))
                     ? "text-foreground"
                     : "text-red-400"
                 )}
               >
-                {allTimeWinnings.gt(new BN(0))
-                  ? "+"
-                  : allTimeWinnings.eq(new BN(0))
-                  ? ""
-                  : "-"}
-                {parseLamportsToSol(allTimeWinnings.toString())} SOL
+                {netPnL.gt(new BN(0)) ? "+" : netPnL.eq(new BN(0)) ? "" : "-"}
+                {parseLamportsToSol(netPnL.toString())} SOL
               </span>
             </p>
           )}
@@ -652,13 +635,5 @@ function Main() {
         </div>
       </div>
     </section>
-  );
-}
-
-export function BetHistory() {
-  return (
-    <RoundsProvider>
-      <Main />
-    </RoundsProvider>
   );
 }
