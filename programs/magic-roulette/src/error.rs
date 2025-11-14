@@ -40,4 +40,6 @@ pub enum MagicRouletteError {
     WinningsAlreadyClaimed,
     #[msg("Address cannot be default pubkey")]
     InvalidAddress,
+    #[msg("Vault does not have enough funds for withdrawal")]
+    VaultNotWithdrawable,
 }
