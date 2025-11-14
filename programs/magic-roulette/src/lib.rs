@@ -22,7 +22,7 @@ pub mod magic_roulette {
         round_period_ts: u64,
     ) -> Result<()> {
         ctx.accounts
-            .initialize_table(&ctx.bumps, minimum_bet_amount, round_period_ts)
+            .handler(&ctx.bumps, minimum_bet_amount, round_period_ts)
     }
 
     pub fn update_table(
@@ -30,8 +30,7 @@ pub mod magic_roulette {
         minimum_bet_amount: Option<u64>,
         round_period_ts: Option<u64>,
     ) -> Result<()> {
-        ctx.accounts
-            .update_table(minimum_bet_amount, round_period_ts)
+        ctx.accounts.handler(minimum_bet_amount, round_period_ts)
     }
 
     pub fn place_bet(ctx: Context<PlaceBet>, bet_type: BetType, bet_amount: u64) -> Result<()> {

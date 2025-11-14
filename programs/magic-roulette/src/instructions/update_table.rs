@@ -16,7 +16,7 @@ pub struct UpdateTable<'info> {
 }
 
 impl<'info> UpdateTable<'info> {
-    pub fn update_table(
+    pub fn handler(
         &mut self,
         minimum_bet_amount: Option<u64>,
         round_period_ts: Option<u64>,
