@@ -1,5 +1,6 @@
 pub mod constants;
 pub mod error;
+pub mod events;
 pub mod instructions;
 pub mod state;
 pub mod utils;
@@ -22,16 +23,17 @@ pub mod magic_roulette {
         round_period_ts: u64,
     ) -> Result<()> {
         ctx.accounts
-            .initialize_table(&ctx.bumps, minimum_bet_amount, round_period_ts)
+            .handler(&ctx.bumps, minimum_bet_amount, round_period_ts)
     }
 
     pub fn update_table(
         ctx: Context<UpdateTable>,
         minimum_bet_amount: Option<u64>,
         round_period_ts: Option<u64>,
+        new_admin: Option<Pubkey>,
     ) -> Result<()> {
         ctx.accounts
-            .update_table(minimum_bet_amount, round_period_ts)
+            .handler(minimum_bet_amount, round_period_ts, new_admin)
     }
 
     pub fn place_bet(ctx: Context<PlaceBet>, bet_type: BetType, bet_amount: u64) -> Result<()> {
@@ -51,5 +53,9 @@ pub mod magic_roulette {
         ctx: Context<'_, '_, '_, 'info, ClaimWinnings<'info>>,
     ) -> Result<()> {
         ClaimWinnings::handler(ctx)
+    }
+
+    pub fn withdraw_vault(ctx: Context<WithdrawVault>, amount: Option<u64>) -> Result<()> {
+        ctx.accounts.handler(amount)
     }
 }

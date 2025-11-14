@@ -36,7 +36,7 @@ pub struct InitializeTable<'info> {
 }
 
 impl<'info> InitializeTable<'info> {
-    pub fn initialize_table(
+    pub fn handler(
         &mut self,
         bumps: &InitializeTableBumps,
         minimum_bet_amount: u64,

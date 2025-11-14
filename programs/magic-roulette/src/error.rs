@@ -38,4 +38,8 @@ pub enum MagicRouletteError {
     InvalidBetType,
     #[msg("Winnings have already been claimed for this bet")]
     WinningsAlreadyClaimed,
+    #[msg("Address cannot be default pubkey")]
+    InvalidAddress,
+    #[msg("Vault does not have enough funds for withdrawal")]
+    VaultNotWithdrawable,
 }

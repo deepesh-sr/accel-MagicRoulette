@@ -3,7 +3,9 @@ use std::ops::Add;
 use anchor_lang::prelude::*;
 use ephemeral_vrf_sdk::{consts::VRF_PROGRAM_IDENTITY, rnd::random_u8_with_range};
 
-use crate::{error::MagicRouletteError, BetType, Round, Table, ROUND_SEED, TABLE_SEED};
+use crate::{
+    error::MagicRouletteError, events::RoundAdvanced, BetType, Round, Table, ROUND_SEED, TABLE_SEED,
+};
 
 #[derive(Accounts)]
 pub struct AdvanceRound<'info> {
@@ -43,6 +45,15 @@ impl<'info> AdvanceRound<'info> {
         self.table.next_round_ts = now
             .checked_add(self.table.round_period_ts as i64)
             .ok_or(MagicRouletteError::MathOverflow)?;
+
+        let now = Clock::get()?.unix_timestamp;
+
+        emit!(RoundAdvanced {
+            round: self.current_round.key(),
+            round_number: self.current_round.round_number,
+            outcome,
+            timestamp: now,
+        });
 
         Ok(())
     }

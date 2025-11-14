@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{error::MagicRouletteError, Table, TABLE_SEED};
+use crate::{error::MagicRouletteError, events::TableUpdated, Table, TABLE_SEED};
 
 #[derive(Accounts)]
 pub struct UpdateTable<'info> {
@@ -16,10 +16,11 @@ pub struct UpdateTable<'info> {
 }
 
 impl<'info> UpdateTable<'info> {
-    pub fn update_table(
+    pub fn handler(
         &mut self,
         minimum_bet_amount: Option<u64>,
         round_period_ts: Option<u64>,
+        new_admin: Option<Pubkey>,
     ) -> Result<()> {
         if let Some(minimum_bet_amount) = minimum_bet_amount {
             require!(
@@ -35,6 +36,24 @@ impl<'info> UpdateTable<'info> {
 
             self.table.round_period_ts = round_period_ts;
         }
+
+        if let Some(new_admin) = new_admin {
+            require!(
+                new_admin != Pubkey::default(),
+                MagicRouletteError::InvalidAddress
+            );
+
+            self.table.admin = new_admin;
+        }
+
+        let now = Clock::get()?.unix_timestamp;
+
+        emit!(TableUpdated {
+            minimum_bet_amount: minimum_bet_amount,
+            new_admin: new_admin,
+            round_period_ts: round_period_ts,
+            timestamp: now,
+        });
 
         Ok(())
     }
