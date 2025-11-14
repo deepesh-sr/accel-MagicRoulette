@@ -106,18 +106,19 @@ export function PlaceBetSection() {
                 throw new Error("Round data should not be null.");
               }
 
-              prev.push({
-                publicKey: magicRouletteClient
-                  .getBetPda(new PublicKey(roundData.publicKey), publicKey)
-                  .toBase58(),
-                amount: amountInLamports,
-                betType: selectedBet,
-                isClaimed: false,
-                player: publicKey.toBase58(),
-                round: roundData.publicKey,
-              });
-
-              return prev;
+              return [
+                ...prev,
+                {
+                  publicKey: magicRouletteClient
+                    .getBetPda(new PublicKey(roundData.publicKey), publicKey)
+                    .toBase58(),
+                  amount: amountInLamports,
+                  betType: selectedBet,
+                  isClaimed: false,
+                  player: publicKey.toBase58(),
+                  round: roundData.publicKey,
+                },
+              ];
             });
 
             return showTransactionToast("Bet placed!", signature);
