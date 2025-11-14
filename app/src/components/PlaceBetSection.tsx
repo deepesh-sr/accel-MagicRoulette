@@ -120,7 +120,7 @@ export function PlaceBetSection() {
               return prev;
             });
 
-            return showTransactionToast("Bet place!", signature);
+            return showTransactionToast("Bet placed!", signature);
           },
           error: (err) => {
             console.error(err);
