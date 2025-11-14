@@ -214,7 +214,7 @@ export function RoundInfo() {
           }}
         >
           <RoundInfoSpan
-            text={lastRoundOutcome ? lastRoundOutcome.toString() : "-"}
+            text={lastRoundOutcome !== null ? lastRoundOutcome.toString() : "-"}
           />
           <RoundInfoP text="Last Round Outcome" />
         </InfoDiv>
