@@ -11,7 +11,6 @@ import { BalanceProvider } from "@/providers/BalanceProvider";
 import { TimeProvider } from "@/providers/TimeProvider";
 import { TransactionProvider } from "@/providers/TransactionProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
-import { RoundsProvider } from "@/providers/RoundsProvider";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -34,9 +33,7 @@ export function Providers({ children }: { children: ReactNode }) {
               <ProgramProvider>
                 <TransactionProvider>
                   <BalanceProvider>
-                    <TableProvider>
-                      <RoundsProvider>{children}</RoundsProvider>
-                    </TableProvider>
+                    <TableProvider>{children}</TableProvider>
                   </BalanceProvider>
                 </TransactionProvider>
               </ProgramProvider>
