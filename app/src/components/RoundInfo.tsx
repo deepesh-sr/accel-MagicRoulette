@@ -10,7 +10,6 @@ import {
   formatCountdown,
   milliToTimestamp,
 } from "@/lib/utils";
-import { useRound } from "@/providers/RoundProvider";
 import { useProgram } from "@/providers/ProgramProvider";
 import { useConnection } from "@jup-ag/wallet-adapter";
 import { BN } from "@coral-xyz/anchor";
@@ -45,10 +44,15 @@ export function RoundInfo() {
   const { priorityFee, getAccountLink } = useSettings();
   const { connection } = useConnection();
   const { tableData, tableLoading } = useTable();
-  const { roundData, roundLoading, roundMutate, isRoundOver, roundEndsInSecs } =
-    useRound();
   const { betsData, betsLoading } = useBets();
-  const { lastRoundOutcome, roundsMutate } = useRounds();
+  const {
+    lastRoundOutcome,
+    currentRound,
+    isRoundOver,
+    roundEndsInSecs,
+    roundsLoading,
+    roundsMutate,
+  } = useRounds();
   const {
     isSendingTransaction,
     setIsSendingTransaction,
@@ -61,13 +65,13 @@ export function RoundInfo() {
 
   const currentBetType = useMemo(() => {
     const betAcc = betsData?.find((bet) => {
-      return bet.round === roundData?.publicKey;
+      return bet.round === currentRound?.publicKey;
     });
 
     if (!betAcc) return null;
 
     return betAcc.betType;
-  }, [roundData, betsData]);
+  }, [currentRound, betsData]);
 
   const spinRoulette = useCallback(() => {
     toast.promise(
@@ -108,28 +112,17 @@ export function RoundInfo() {
       {
         loading: "Spinning roulette...",
         success: async ({ signature }) => {
-          await roundMutate((prev) => {
-            if (!prev) {
-              throw new Error("Round should not be null.");
-            }
-
-            return {
-              ...prev,
-              isSpun: true,
-            };
-          });
-
           await roundsMutate((prev) => {
             if (!prev) {
               throw new Error("Rounds should not be null.");
             }
 
-            if (!roundData) {
+            if (!currentRound) {
               throw new Error("Round should not be null.");
             }
 
             return prev.map((round) => {
-              if (round.publicKey === roundData.publicKey) {
+              if (round.publicKey === currentRound.publicKey) {
                 return {
                   ...round,
                   isSpun: true,
@@ -150,13 +143,12 @@ export function RoundInfo() {
     );
   }, [
     tableData,
-    roundData,
+    currentRound,
     connection,
     magicRouletteClient,
     priorityFee,
     setIsSendingTransaction,
     showTransactionToast,
-    roundMutate,
     roundsMutate,
   ]);
 
@@ -184,22 +176,22 @@ export function RoundInfo() {
           <RoundInfoP text="Current Round" />
         </InfoDiv>
         <InfoDiv
-          className={cn(roundData ? "cursor-pointer" : "")}
+          className={cn(currentRound ? "cursor-pointer" : "")}
           onClick={() => {
-            if (roundData) {
+            if (currentRound) {
               window.open(
-                getAccountLink(roundData.publicKey.toString()),
+                getAccountLink(currentRound.publicKey.toString()),
                 "_blank"
               );
             }
           }}
         >
-          {roundLoading ? (
+          {roundsLoading ? (
             <LoadingSkeleton />
           ) : (
-            roundData && (
+            currentRound && (
               <RoundInfoSpan
-                text={`${parseInt(roundData.poolAmount) / LAMPORTS_PER_SOL}`}
+                text={`${parseInt(currentRound.poolAmount) / LAMPORTS_PER_SOL}`}
               />
             )
           )}
@@ -231,9 +223,9 @@ export function RoundInfo() {
         <InfoDiv
           className={cn(currentBetType ? "cursor-pointer" : "")}
           onClick={() => {
-            if (currentBetType && betsData && roundData) {
+            if (currentBetType && betsData && currentRound) {
               const bet = betsData.find((bet) => {
-                return bet.round === roundData.publicKey;
+                return bet.round === currentRound.publicKey;
               });
 
               if (!bet) {
@@ -244,7 +236,7 @@ export function RoundInfo() {
             }
           }}
         >
-          {roundLoading || betsLoading ? (
+          {roundsLoading || betsLoading ? (
             <LoadingSkeleton />
           ) : (
             <RoundInfoSpan
@@ -258,9 +250,9 @@ export function RoundInfo() {
       </div>
       <BigRoundedButton
         onClick={spinRoulette}
-        disabled={roundData?.isSpun || !isRoundOver || isSendingTransaction}
+        disabled={currentRound?.isSpun || !isRoundOver || isSendingTransaction}
       >
-        {roundData?.isSpun
+        {currentRound?.isSpun
           ? "Awaiting outcome..."
           : !isRoundOver
           ? `Round ends in ${formatCountdown(

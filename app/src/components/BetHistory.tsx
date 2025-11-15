@@ -56,7 +56,6 @@ import { BN } from "@coral-xyz/anchor";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { Skeleton } from "./ui/skeleton";
 import { parseBN } from "@/types/accounts";
-import { useRound } from "@/providers/RoundProvider";
 
 type BetHistoryRecord = {
   publicKey: string;
@@ -144,7 +143,6 @@ export function BetHistory() {
   const { publicKey, signTransaction } = useUnifiedWallet();
   const { magicRouletteClient } = useProgram();
   const { roundsData, roundsLoading } = useRounds();
-  const { roundData } = useRound();
   const { betsData, betsLoading, betsMutate } = useBets();
   const { getAccountLink, priorityFee } = useSettings();
   const {
@@ -183,7 +181,7 @@ export function BetHistory() {
   }, [claimableBets]);
 
   const netPnL = useMemo(() => {
-    if (!betsData || !roundData || !roundsData) return new BN(0);
+    if (!betsData || !roundsData) return new BN(0);
 
     return betsData.reduce((total, bet) => {
       const matchingRound = roundsData.find(
@@ -206,7 +204,7 @@ export function BetHistory() {
         return total.sub(new BN(bet.amount));
       }
     }, new BN(0));
-  }, [roundData, roundsData, betsData]);
+  }, [roundsData, betsData]);
 
   const data = useMemo<BetHistoryRecord[]>(() => {
     if (!roundsData || !betsData) return [];
