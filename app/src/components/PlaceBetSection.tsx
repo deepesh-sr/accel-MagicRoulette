@@ -19,8 +19,8 @@ import { cn, parseLamportsToSol, parseSolToLamports } from "@/lib/utils";
 import { WalletMinimal } from "lucide-react";
 import { BigRoundedButton } from "./BigRoundedButton";
 import { InfoDiv } from "./InfoDiv";
-import { useRound } from "@/providers/RoundProvider";
 import { useTable } from "@/providers/TableProvider";
+import { useRounds } from "@/providers/RoundsProvider";
 
 const increments = [1, 0.1, 0.01];
 
@@ -31,7 +31,7 @@ export function PlaceBetSection() {
   const { priorityFee } = useSettings();
   const { magicRouletteClient } = useProgram();
   const { tableData } = useTable();
-  const { roundData, isRoundOver } = useRound();
+  const { currentRound, isRoundOver } = useRounds();
   const { betsData, betsMutate, selectedBet, formattedBet } = useBets();
   const {
     isSendingTransaction,
@@ -49,7 +49,7 @@ export function PlaceBetSection() {
   const placedBet = Boolean(
     betsData?.find((bet) => {
       return (
-        bet.round === roundData?.publicKey &&
+        bet.round === currentRound?.publicKey &&
         bet.player === publicKey?.toBase58()
       );
     })
@@ -102,7 +102,7 @@ export function PlaceBetSection() {
                 throw new Error("Bets should not be null.");
               }
 
-              if (!roundData) {
+              if (!currentRound) {
                 throw new Error("Round data should not be null.");
               }
 
@@ -110,13 +110,13 @@ export function PlaceBetSection() {
                 ...prev,
                 {
                   publicKey: magicRouletteClient
-                    .getBetPda(new PublicKey(roundData.publicKey), publicKey)
+                    .getBetPda(new PublicKey(currentRound.publicKey), publicKey)
                     .toBase58(),
                   amount: amountInLamports,
                   betType: selectedBet,
                   isClaimed: false,
                   player: publicKey.toBase58(),
-                  round: roundData.publicKey,
+                  round: currentRound.publicKey,
                 },
               ];
             });
@@ -137,7 +137,7 @@ export function PlaceBetSection() {
       priorityFee,
       publicKey,
       selectedBet,
-      roundData,
+      currentRound,
       signTransaction,
       setIsSendingTransaction,
       showTransactionToast,

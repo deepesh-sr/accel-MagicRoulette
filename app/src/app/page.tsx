@@ -1,11 +1,8 @@
 "use client";
 
 import { BetsProvider } from "@/providers/BetsProvider";
-import { useProgram } from "@/providers/ProgramProvider";
-import { RoundProvider } from "@/providers/RoundProvider";
 import { useTable } from "@/providers/TableProvider";
 import { useUnifiedWallet } from "@jup-ag/wallet-adapter";
-import { BN } from "@coral-xyz/anchor";
 import { Spinner } from "@/components/ui/spinner";
 import { RoundInfo } from "@/components/RoundInfo";
 import { RouletteTable } from "@/components/RouletteTable";
@@ -28,7 +25,6 @@ function Main() {
 }
 
 export default function Page() {
-  const { magicRouletteClient } = useProgram();
   const { publicKey } = useUnifiedWallet();
   const { tableData, tableLoading } = useTable();
 
@@ -44,25 +40,9 @@ export default function Page() {
   // only load all bets when wallet is connected
   return publicKey ? (
     <BetsProvider player={publicKey.toBase58()}>
-      {tableData && (
-        <RoundProvider
-          pda={magicRouletteClient
-            .getRoundPda(new BN(Number(tableData.currentRoundNumber)))
-            .toBase58()}
-        >
-          <Main />
-        </RoundProvider>
-      )}
+      <Main />
     </BetsProvider>
   ) : (
-    tableData && (
-      <RoundProvider
-        pda={magicRouletteClient
-          .getRoundPda(new BN(Number(tableData.currentRoundNumber)))
-          .toBase58()}
-      >
-        <Main />
-      </RoundProvider>
-    )
+    tableData && <Main />
   );
 }
