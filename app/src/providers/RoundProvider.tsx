@@ -89,7 +89,7 @@ export function RoundProvider({
             poolAmount: parseBN(round.poolAmount),
           };
         });
-      } else if (round.outcome) {
+      } else if (round.outcome !== null) {
         // round outcome has been set
         setLastRoundOutcome(round.outcome);
 
