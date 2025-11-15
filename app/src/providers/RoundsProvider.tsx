@@ -142,7 +142,6 @@ export function RoundsProvider({
         });
       } else if (round.outcome !== null) {
         if (publicKey && currentRound) {
-          // note: RoundsProvider is not a child of BetsProvider
           const roundPlayerBet = betsData?.find((bet) => {
             return bet.round === currentRound.publicKey;
           });
