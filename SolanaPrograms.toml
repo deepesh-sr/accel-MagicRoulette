@@ -1,0 +1,8 @@
+[program]
+name = "magic_roulette"
+version = "0.1.0"
+program_id = "RoUnLrec2JvYFMf6ZWnK2wgK8xKaUjwi1GEUPf6fFiF"
+network = "devnet"
+description = "Perpetual roulette game"
+repository = "https://github.com/chiefwoods/magic-roulette"
+authority_keypair = "magic-roulette-wallet.json"
