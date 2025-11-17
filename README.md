@@ -129,3 +129,24 @@ bun run test
 
 > [!NOTE]  
 > Run `bun run reset; bun run test` to run 'hot-reloading' tests.
+
+## Issues
+
+View the [open issues](https://github.com/ChiefWoods/magic-roulette/issues) for a full list of proposed features and known bugs.
+
+## Acknowledgements
+
+### Resources
+
+- [Shields.io](https://shields.io/)
+
+### Hosting and API
+
+- [Vercel](https://vercel.com/)
+- [Helius](https://www.helius.dev/)
+- [Sanctum Gateway](https://gateway.sanctum.so/)
+- [MagicBlock](https://www.magicblock.xyz/)
+
+## Contact
+
+[chii.yuen@hotmail.com](mailto:chii.yuen@hotmail.com)
