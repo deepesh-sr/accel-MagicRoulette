@@ -81,25 +81,6 @@ impl<'info> ClaimWinnings<'info> {
                 .ok_or(MagicRouletteError::MathOverflow)?
                 .checked_add(bet.amount)
                 .ok_or(MagicRouletteError::MathOverflow)?;
-            let vault_seeds: &[&[u8]] = &[VAULT_SEED, &[ctx.accounts.table.vault_bump]];
-
-            // although chances are small, it is possible for vault to not have enough funds to pay out winnings
-            require!(
-                vault.lamports() >= bet_payout,
-                MagicRouletteError::InsufficientVaultFunds
-            );
-
-            transfer(
-                CpiContext::new(
-                    system_program.to_account_info(),
-                    Transfer {
-                        from: vault.to_account_info(),
-                        to: player.to_account_info(),
-                    },
-                )
-                .with_signer(&[vault_seeds]),
-                bet_payout,
-            )?;
 
             winnings = winnings
                 .checked_add(bet_payout)
@@ -115,6 +96,26 @@ impl<'info> ClaimWinnings<'info> {
             remaining_accounts.next().is_none(),
             MagicRouletteError::InsufficientRemainingAccounts
         );
+
+        // although chances are small, it is possible for vault to not have enough funds to pay out winnings
+        require!(
+            vault.lamports() >= winnings,
+            MagicRouletteError::InsufficientVaultFunds
+        );
+
+        let vault_seeds: &[&[u8]] = &[VAULT_SEED, &[ctx.accounts.table.vault_bump]];
+
+        transfer(
+            CpiContext::new(
+                system_program.to_account_info(),
+                Transfer {
+                    from: vault.to_account_info(),
+                    to: player.to_account_info(),
+                },
+            )
+            .with_signer(&[vault_seeds]),
+            winnings,
+        )?;
 
         let now = Clock::get()?.unix_timestamp;
 
