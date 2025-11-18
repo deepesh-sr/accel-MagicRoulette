@@ -27,7 +27,9 @@ describe("magic-roulette", () => {
     new Uint8Array(JSON.parse(process.env.ANCHOR_WALLET!))
   );
   const wallet = new Wallet(keypair);
-  const provider = new AnchorProvider(connection, wallet);
+  const provider = new AnchorProvider(connection, wallet, {
+    commitment: "confirmed",
+  });
   const program = new Program<MagicRoulette>(idl, provider);
   const magicRouletteClient = new MagicRouletteClient(program);
 
@@ -154,7 +156,7 @@ describe("magic-roulette", () => {
           player: player.publicKey,
         })
         .signers([player])
-        .rpc();
+        .rpc({ commitment: "confirmed" });
     }
 
     const roundAcc = await magicRouletteClient.fetchProgramAccount(
